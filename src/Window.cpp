@@ -31,3 +31,9 @@ std::pair<int, int> Window::getSize() const
 {
     return { m_width, m_height };
 }
+
+Window::~Window()
+{
+    SDL_DestroyWindow(m_window);
+    SDL_Quit();
+}

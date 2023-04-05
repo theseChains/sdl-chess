@@ -15,6 +15,8 @@ public:
     // first width, then height
     std::pair<int, int> getSize() const;
 
+    ~Window();
+
 private:
     SDL_Window* m_window{};
     int m_width{};
