@@ -29,7 +29,11 @@ int main()
             {
                 for (unsigned char j{ 0 }; j < 8; ++j)
                 {
-                    SDL_SetRenderDrawColor(renderer, i * 32, j * 32, 255, 255);
+                    if ((i + j) % 2 == 0)
+                        SDL_SetRenderDrawColor(renderer, 230, 230, 230, 255);
+                    else
+                        SDL_SetRenderDrawColor(renderer, 150, 75, 0, 255);
+
                     SDL_RenderFillRect(renderer, &board[i][j]);
                     SDL_RenderDrawRect(renderer, &board[i][j]);
                 }
