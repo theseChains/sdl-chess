@@ -21,6 +21,4 @@ add_executable(app ${program_SOURCES})
 target_include_directories(app PRIVATE ${program_INCLUDE_DIRS})
 target_link_libraries(app ${SDL2_LIBRARIES})
 
-target_compile_options(app PRIVATE -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Werror
-								   -fsanitize=address)
-target_link_options(app PRIVATE -fsanitize=address)
+target_compile_options(app PRIVATE -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Werror)
