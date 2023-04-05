@@ -32,6 +32,11 @@ std::pair<int, int> Window::getSize() const
     return { m_width, m_height };
 }
 
+SDL_Window* Window::getWindow() const
+{
+    return m_window;
+}
+
 Window::~Window()
 {
     SDL_DestroyWindow(m_window);
