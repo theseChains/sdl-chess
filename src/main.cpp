@@ -1,10 +1,11 @@
+#include "Constants.h"
 #include "Window.h"
 
 #include <iostream>
 
 int main()
 {
-    Window window{ 640, 480 };
+    Window window{ constants::windowWidth, constants::windowHeight };
 
     bool run{ true };
     SDL_Event event{};
