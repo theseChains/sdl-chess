@@ -13,4 +13,21 @@ Window::Window(int width, int height) : m_width{ width }, m_height{ height }
 
     if (window == nullptr)
         throw std::runtime_error{ "could not initialize the sdl window" };
+
+    m_window = window;
+}
+
+int Window::getWidth() const
+{
+    return m_width;
+}
+
+int Window::getHeight() const
+{
+    return m_height;
+}
+
+std::pair<int, int> Window::getSize() const
+{
+    return { m_width, m_height };
 }
