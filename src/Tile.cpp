@@ -24,3 +24,13 @@ DrawColor Tile::getConvertedColor() const
 
     return { 150, 75, 0, 255 };
 }
+
+const std::optional<Piece>& Tile::getPiece() const
+{
+    return m_piece;
+}
+
+std::optional<Piece> Tile::getPiece()
+{
+    return m_piece;
+}
