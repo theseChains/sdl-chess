@@ -37,5 +37,6 @@ void Application::update()
 void Application::draw()
 {
     m_renderer.clear();
+    m_board.draw(m_renderer);
     m_renderer.present();
 }
