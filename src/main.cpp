@@ -1,6 +1,8 @@
 #include "Constants.h"
 #include "Window.h"
 
+#include <SDL2/SDL_image.h>
+
 #include <array>
 #include <iostream>
 
@@ -13,6 +15,16 @@ int main()
     for (int i{ 0 }; i < 8; ++i)
         for (int j{ 0 }; j < 8; ++j)
             board[i][j] = { i * 100, j * 100, 100, 100 };
+
+    SDL_Texture* image{ IMG_LoadTexture(renderer, "../res/pawn.png") };
+    int imageWidth{};
+    int imageHeight{};
+    SDL_QueryTexture(image, nullptr, nullptr, &imageWidth, &imageHeight);
+
+    std::array<std::array<SDL_Rect, 8>, 8> pieces{};
+    for (int i{ 0 }; i < 8; ++i)
+        for (int j{ 0 }; j < 8; ++j)
+            pieces[i][j] = { i * 100, j * 100, imageWidth, imageHeight };
 
     bool run{ true };
     SDL_Event event{};
@@ -36,6 +48,8 @@ int main()
 
                     SDL_RenderFillRect(renderer, &board[i][j]);
                     SDL_RenderDrawRect(renderer, &board[i][j]);
+
+                    SDL_RenderCopy(renderer, image, nullptr, &pieces[i][j]);
                 }
             }
 
