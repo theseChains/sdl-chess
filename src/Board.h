@@ -9,7 +9,7 @@
 class Board
 {
 public:
-    Board();
+    Board(Renderer& renderer);
 
     void draw(Renderer& renderer);
 
