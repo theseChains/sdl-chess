@@ -21,6 +21,11 @@ void Renderer::setDrawColor(unsigned char red, unsigned char green, unsigned cha
     SDL_SetRenderDrawColor(m_renderer, red, green, blue, alpha);
 }
 
+void Renderer::setDrawColor(const DrawColor& color)
+{
+    SDL_SetRenderDrawColor(m_renderer, color.red, color.green, color.blue, color.alpha);
+}
+
 void Renderer::fillRect(const SDL_Rect& rectangle)
 {
     SDL_RenderFillRect(m_renderer, &rectangle);

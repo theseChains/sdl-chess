@@ -1,6 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "DrawColor.h"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -16,6 +18,7 @@ public:
 
     void setDrawColor(unsigned char red, unsigned char green, unsigned char blue,
             unsigned char alpha);
+    void setDrawColor(const DrawColor& color);
 
     void fillRect(const SDL_Rect& rectangle);
     void drawRect(const SDL_Rect& rectangle);
