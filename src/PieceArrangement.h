@@ -9,14 +9,14 @@ namespace config
 {
     using enum PieceType;
     inline constexpr std::array<std::array<PieceType, 8>, 8> arrangement{ {
-        { { rook, knight, bishop, queen, king, bishop, knight, rook } },
-        { { pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn } },
+        { { bRook, bKnight, bBishop, bQueen, bKing, bBishop, bKnight, bRook } },
+        { { bPawn, bPawn, bPawn, bPawn, bPawn, bPawn, bPawn, bPawn } },
         { { none, none, none, none, none, none, none, none } },
         { { none, none, none, none, none, none, none, none } },
         { { none, none, none, none, none, none, none, none } },
         { { none, none, none, none, none, none, none, none } },
-        { { pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn } },
-        { { rook, knight, bishop, queen, king, bishop, knight, rook } }
+        { { wPawn, wPawn, wPawn, wPawn, wPawn, wPawn, wPawn, wPawn} },
+        { { wRook, wKnight, wBishop, wQueen, wKing, wBishop, wKnight, wRook } }
     } };
 }
 
