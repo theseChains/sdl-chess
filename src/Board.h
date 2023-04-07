@@ -16,6 +16,8 @@ public:
 
 private:
     std::array<std::array<Tile, 8>, 8> m_board;
+
+    void initializeTile(TextureTable& table, int i, int j);
 };
 
 #endif

@@ -9,15 +9,7 @@ Board::Board(TextureTable& table)
     {
         for (int j{ 0 }; j < 8; ++j)
         {
-            PieceType type{ config::arrangement[j][i] };
-            if (type == PieceType::none)
-                m_board[i][j] = { getTileColor(i, j), std::nullopt, { i * 100, j * 100 } };
-            else
-            {
-                PieceColor color{ getPieceColor(type) };
-                Piece piece{ type, color, table[{ color, type }], { i * 100, j * 100 } };
-                m_board[i][j] = { getTileColor(i, j), piece, { i * 100, j * 100 } };
-            }
+            initializeTile(table, i, j);
         }
     }
 }
@@ -35,5 +27,18 @@ void Board::draw(Renderer& renderer)
             if (piece)
                 piece.value().draw(renderer);
         }
+    }
+}
+
+void Board::initializeTile(TextureTable& table, int i, int j)
+{
+    PieceType type{ config::arrangement[j][i] };
+    if (type == PieceType::none)
+        m_board[i][j] = { getTileColor(i, j), std::nullopt, { i * 100, j * 100 } };
+    else
+    {
+        PieceColor color{ getPieceColor(type) };
+        Piece piece{ type, color, table[{ color, type }], { i * 100, j * 100 } };
+        m_board[i][j] = { getTileColor(i, j), piece, { i * 100, j * 100 } };
     }
 }
