@@ -10,9 +10,14 @@ Board::Board(TextureTable& table)
         for (int j{ 0 }; j < 8; ++j)
         {
             PieceType type{ config::arrangement[j][i] };
-            PieceColor color{ getPieceColor(type) };
-            Piece piece{ type, color, table[{ color, type }], { i * 100, j * 100 } };
-            m_board[i][j] = { getTileColor(i, j), piece, { i * 100, j * 100 } };
+            if (type == PieceType::none)
+                m_board[i][j] = { getTileColor(i, j), std::nullopt, { i * 100, j * 100 } };
+            else
+            {
+                PieceColor color{ getPieceColor(type) };
+                Piece piece{ type, color, table[{ color, type }], { i * 100, j * 100 } };
+                m_board[i][j] = { getTileColor(i, j), piece, { i * 100, j * 100 } };
+            }
         }
     }
 }
