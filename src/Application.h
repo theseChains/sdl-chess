@@ -6,6 +6,7 @@
 
 #include "Board.h"
 #include "Constants.h"
+#include "TextureTable.h"
 #include "Renderer.h"
 #include "Window.h"
 
@@ -19,6 +20,7 @@ public:
 private:
     Window m_window;
     Renderer m_renderer;
+    TextureTable m_textures;
     Board m_board;
 
     void processInput(SDL_Event& event, bool& keepRunning);

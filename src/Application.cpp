@@ -3,7 +3,8 @@
 Application::Application()
     : m_window{ constants::windowWidth, constants::windowHeight }
     , m_renderer{ m_window.getWindow(), -1, SDL_RENDERER_SOFTWARE }
-    , m_board{ m_renderer }
+    , m_textures{ m_renderer }
+    , m_board{ m_textures }
 {
 }
 
