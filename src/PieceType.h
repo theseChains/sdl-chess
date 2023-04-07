@@ -3,13 +3,20 @@
 
 enum class PieceType
 {
+    // w for white, b for black
     none,
-    pawn,
-    knight,
-    bishop,
-    rook,
-    queen,
-    king
+    wPawn,
+    wKnight,
+    wBishop,
+    wRook,
+    wQueen,
+    wKing,
+    bPawn,
+    bKnight,
+    bBishop,
+    bRook,
+    bQueen,
+    bKing
 };
 
 #endif
