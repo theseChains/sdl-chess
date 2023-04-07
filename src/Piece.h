@@ -1,6 +1,7 @@
 #ifndef PIECE_H
 #define PIECE_H
 
+#include "Colors.h"
 #include "PieceType.h"
 #include "Renderer.h"
 
@@ -11,12 +12,13 @@
 class Piece
 {
 public:
-    Piece(PieceType type, SDL_Texture* texture, std::pair<int, int> position);
+    Piece(PieceType type, PieceColor color, SDL_Texture* texture, std::pair<int, int> position);
 
     void draw(Renderer& renderer);
 
 private:
     PieceType m_type{};
+    PieceColor m_color{};
     SDL_Rect m_rectangle{};
     SDL_Texture* m_texture{};
     std::pair<int, int> m_position{};
