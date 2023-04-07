@@ -3,7 +3,7 @@
 
 #include "DrawColor.h"
 #include "Piece.h"
-#include "TileColor.h"
+#include "Colors.h"
 
 #include <SDL2/SDL.h>
 

@@ -1,10 +1,12 @@
 #include "Tile.h"
 
+#include "Constants.h"
+
 Tile::Tile(TileColor color, const std::optional<Piece>& piece, std::pair<int, int> position)
     : m_color{ color }, m_piece{ piece }
 {
-    // todo: replace 100 with constants
-    m_rectangle = { position.first, position.second, 100, 100 };
+    m_rectangle = { position.first, position.second, constants::windowWidth / constants::boardSize,
+        constants::windowHeight / constants::boardSize };
 }
 
 const SDL_Rect& Tile::getRectangle() const
