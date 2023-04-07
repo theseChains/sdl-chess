@@ -2,6 +2,7 @@
 #define BOARD_H
 
 #include "Renderer.h"
+#include "TextureTable.h"
 #include "Tile.h"
 
 #include <array>
@@ -9,7 +10,7 @@
 class Board
 {
 public:
-    Board(Renderer& renderer);
+    Board(TextureTable& table);
 
     void draw(Renderer& renderer);
 

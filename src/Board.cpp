@@ -1,13 +1,14 @@
 #include "Board.h"
+#include "PieceArrangement.h"
 
-Board::Board(Renderer& renderer)
+Board::Board(TextureTable& table)
 {
-    SDL_Texture* texture{ renderer.loadTexture("../res/pawn.png") };
     for (int i{ 0 }; i < 8; ++i)
     {
         for (int j{ 0 }; j < 8; ++j)
         {
-            Piece piece{ PieceType::pawn, texture, { i * 100, j * 100 } };
+            PieceType type{ config::arrangement[j][i] };
+            Piece piece{ type, table[type], { i * 100, j * 100 } };
             m_board[i][j] = { getTileColor(i, j), piece, { i * 100, j * 100 } };
         }
     }
@@ -21,7 +22,10 @@ void Board::draw(Renderer& renderer)
         {
             renderer.setDrawColor(m_board[i][j].getConvertedColor());
             renderer.fillAndDrawRect(m_board[i][j].getRectangle());
-            m_board[i][j].getPiece().value().draw(renderer);
+
+            auto piece{ m_board[i][j].getPiece() };
+            if (piece)
+                piece.value().draw(renderer);
         }
     }
 }
