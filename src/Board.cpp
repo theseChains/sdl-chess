@@ -3,8 +3,6 @@
 #include "Colors.h"
 #include "PieceArrangement.h"
 
-#include <iostream>
-
 Board::Board(TextureTable& table)
 {
     for (int i{ 0 }; i < 8; ++i)
@@ -66,8 +64,6 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
             if (piece && piece->isSelected())
             {
                 tile.getPiece()->setPosition(getSnappedBoardPosition(mousePosition));
-                std::cout << "new position: " << tile.getPiece()->getPosition().first << ' ' <<
-                    tile.getPiece()->getPosition().second << '\n';
                 tile.getPiece()->deselect();
             }
         }
