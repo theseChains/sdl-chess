@@ -7,6 +7,7 @@ Application::Application()
     , m_renderer{ m_window.getWindow(), -1, SDL_RENDERER_SOFTWARE }
     , m_textures{ m_renderer }
     , m_board{ m_textures }
+    , m_userInput{}
 {
 }
 
@@ -30,9 +31,6 @@ void Application::run()
     }
 }
 
-SDL_Point mousePosition{};
-bool pieceSelected{ false };
-
 void Application::processInput(SDL_Event& event, bool& keepRunning)
 {
     while (SDL_PollEvent(&event) != 0)
@@ -43,15 +41,7 @@ void Application::processInput(SDL_Event& event, bool& keepRunning)
         if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_ESCAPE)
             keepRunning = false;
 
-        if (event.type == SDL_MOUSEMOTION)
-            mousePosition = { event.motion.x, event.motion.y };
-
-        if (event.type == SDL_MOUSEBUTTONDOWN && !pieceSelected &&
-                event.button.button == SDL_BUTTON_LEFT)
-            m_board.checkForPieceSelection(mousePosition, pieceSelected);
-        else if (event.type == SDL_MOUSEBUTTONDOWN && pieceSelected &&
-                event.button.button == SDL_BUTTON_LEFT)
-            m_board.checkForPieceMovement(mousePosition, pieceSelected);
+        m_userInput.handleEvent(event, m_board);
     }
 }
 

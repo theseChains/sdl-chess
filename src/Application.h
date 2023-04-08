@@ -8,6 +8,7 @@
 #include "Constants.h"
 #include "TextureTable.h"
 #include "Renderer.h"
+#include "UserInput.h"
 #include "Window.h"
 
 class Application
@@ -22,6 +23,7 @@ private:
     Renderer m_renderer;
     TextureTable m_textures;
     Board m_board;
+    UserInput m_userInput;
 
     void processInput(SDL_Event& event, bool& keepRunning);
     void update();
