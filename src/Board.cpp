@@ -8,12 +8,8 @@
 Board::Board(TextureTable& table)
 {
     for (int i{ 0 }; i < 8; ++i)
-    {
         for (int j{ 0 }; j < 8; ++j)
-        {
             initializeTile(table, i, j);
-        }
-    }
 }
 
 void Board::draw(Renderer& renderer)
@@ -48,12 +44,16 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected)
             auto piece{ tile.getPiece() };
             if (piece && SDL_PointInRect(&mousePosition, &tile.getPiece()->getRectangle()))
             {
-                std::cout << "selected a piece\n";
                 tile.getPiece()->select();
                 pieceSelected = true;
             }
         }
     }
+}
+
+std::pair<int, int> getSnappedBoardPosition(SDL_Point mousePosition)
+{
+    return { mousePosition.x / 100 * 100, mousePosition.y / 100 * 100 };
 }
 
 void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
@@ -65,8 +65,9 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
             auto piece{ tile.getPiece() };
             if (piece && piece->isSelected())
             {
-                std::cout << "changing position\n";
-                tile.getPiece()->setPosition({ mousePosition.x, mousePosition.y });
+                tile.getPiece()->setPosition(getSnappedBoardPosition(mousePosition));
+                std::cout << "new position: " << tile.getPiece()->getPosition().first << ' ' <<
+                    tile.getPiece()->getPosition().second << '\n';
                 tile.getPiece()->deselect();
             }
         }
