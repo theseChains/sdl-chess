@@ -1,7 +1,6 @@
 #include "Window.h"
 
-#include <iostream>
-#include <exception>
+#include <stdexcept>
 
 Window::Window(int width, int height) : m_width{ width }, m_height{ height }
 {
