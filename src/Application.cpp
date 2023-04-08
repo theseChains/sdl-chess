@@ -1,6 +1,6 @@
 #include "Application.h"
 
-#include <iostream>
+#include <cmath>
 
 Application::Application()
     : m_window{ constants::windowWidth, constants::windowHeight }
@@ -16,9 +16,17 @@ void Application::run()
     SDL_Event event{};
     while (keepRunning)
     {
+        auto start{ SDL_GetPerformanceCounter() };
+
         processInput(event, keepRunning);
         update();
         draw();
+
+        auto end{ SDL_GetPerformanceCounter() };
+        float elapsed{ static_cast<float>(end - start) /
+            static_cast<float>(SDL_GetPerformanceFrequency()) * 1000.0f };
+        // cap to 60 fps
+        SDL_Delay(static_cast<int>(std::floor(16.666f - elapsed)));
     }
 }
 
