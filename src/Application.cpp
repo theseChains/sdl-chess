@@ -14,12 +14,11 @@ Application::Application()
 void Application::run()
 {
     bool keepRunning{ true };
-    SDL_Event event{};
     while (keepRunning)
     {
         auto start{ SDL_GetPerformanceCounter() };
 
-        processInput(event, keepRunning);
+        processInput(keepRunning);
         update();
         draw();
 
@@ -31,8 +30,9 @@ void Application::run()
     }
 }
 
-void Application::processInput(SDL_Event& event, bool& keepRunning)
+void Application::processInput(bool& keepRunning)
 {
+    SDL_Event event{};
     while (SDL_PollEvent(&event) != 0)
     {
         if (event.type == SDL_QUIT)

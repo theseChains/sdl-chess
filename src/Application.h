@@ -25,7 +25,7 @@ private:
     Board m_board;
     UserInput m_userInput;
 
-    void processInput(SDL_Event& event, bool& keepRunning);
+    void processInput(bool& keepRunning);
     void update();
     void draw();
 };
