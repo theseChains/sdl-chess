@@ -16,12 +16,23 @@ public:
 
     void draw(Renderer& renderer);
 
+    SDL_Rect& getRectangle();
+    PieceType getType() const;
+    std::pair<int, int> getPosition() const;
+
+    void setPosition(std::pair<int, int> position);
+
+    void select();
+    void deselect();
+    bool isSelected() const;
+
 private:
     PieceType m_type{};
     PieceColor m_color{};
     SDL_Rect m_rectangle{};
     SDL_Texture* m_texture{};
     std::pair<int, int> m_position{};
+    bool m_isSelected{ false };
 };
 
 #endif

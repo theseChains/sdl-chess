@@ -5,7 +5,6 @@
 Piece::Piece(PieceType type, PieceColor color, SDL_Texture* texture, std::pair<int, int> position)
     : m_type{ type }, m_color{ color}, m_texture{ texture }, m_position{ position }
 {
-    // todo: replace 100's with constants
     m_rectangle = { position.first, position.second, constants::windowWidth / constants::boardSize,
         constants::windowHeight / constants::boardSize };
 }
@@ -13,4 +12,41 @@ Piece::Piece(PieceType type, PieceColor color, SDL_Texture* texture, std::pair<i
 void Piece::draw(Renderer& renderer)
 {
     renderer.copyTexture(m_texture, nullptr, &m_rectangle);
+}
+
+SDL_Rect& Piece::getRectangle()
+{
+    return m_rectangle;
+}
+
+void Piece::setPosition(std::pair<int, int> position)
+{
+    m_position = position;
+    m_rectangle.x = position.first;
+    m_rectangle.y = position.second;
+}
+
+PieceType Piece::getType() const
+{
+    return m_type;
+}
+
+std::pair<int, int> Piece::getPosition() const
+{
+    return m_position;
+}
+
+void Piece::select()
+{
+    m_isSelected = true;
+}
+
+void Piece::deselect()
+{
+    m_isSelected = false;
+}
+
+bool Piece::isSelected() const
+{
+    return m_isSelected;
 }

@@ -21,7 +21,7 @@ public:
     SDL_Rect& getRectangle();
     DrawColor getConvertedColor() const;
     const std::optional<Piece>& getPiece() const;
-    std::optional<Piece> getPiece();
+    std::optional<Piece>& getPiece();
 
 private:
     SDL_Rect m_rectangle{};

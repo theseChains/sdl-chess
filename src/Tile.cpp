@@ -32,7 +32,7 @@ const std::optional<Piece>& Tile::getPiece() const
     return m_piece;
 }
 
-std::optional<Piece> Tile::getPiece()
+std::optional<Piece>& Tile::getPiece()
 {
     return m_piece;
 }
