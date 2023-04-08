@@ -24,7 +24,14 @@ void Board::draw(Renderer& renderer)
         {
             renderer.setDrawColor(m_board[i][j].getConvertedColor());
             renderer.fillAndDrawRect(m_board[i][j].getRectangle());
+        }
+    }
 
+    // render pieces on top of the board
+    for (int i{ 0 }; i < 8; ++i)
+    {
+        for (int j{ 0 }; j < 8; ++j)
+        {
             auto piece{ m_board[i][j].getPiece() };
             if (piece)
                 piece.value().draw(renderer);
