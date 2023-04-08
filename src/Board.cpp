@@ -40,10 +40,11 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected)
         for (auto& tile : row)
         {
             auto piece{ tile.getPiece() };
-            if (piece && SDL_PointInRect(&mousePosition, &tile.getPiece()->getRectangle()))
+            if (piece && SDL_PointInRect(&mousePosition, &piece->getRectangle()))
             {
                 tile.getPiece()->select();
                 pieceSelected = true;
+                return;
             }
         }
     }
@@ -51,6 +52,7 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected)
 
 std::pair<int, int> getSnappedBoardPosition(SDL_Point mousePosition)
 {
+    // exception if user clicks on [0, y] or [x, 0] but whatever
     return { mousePosition.x / 100 * 100, mousePosition.y / 100 * 100 };
 }
 
@@ -65,11 +67,11 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
             {
                 tile.getPiece()->setPosition(getSnappedBoardPosition(mousePosition));
                 tile.getPiece()->deselect();
+                pieceSelected = false;
+                return;
             }
         }
     }
-
-    pieceSelected = false;
 }
 
 std::array<std::array<Tile, 8>, 8>& Board::getTiles()
