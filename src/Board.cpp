@@ -3,6 +3,8 @@
 #include "Colors.h"
 #include "PieceArrangement.h"
 
+#include <iostream>
+
 Board::Board(TextureTable& table)
 {
     for (int i{ 0 }; i < 8; ++i)
@@ -28,6 +30,47 @@ void Board::draw(Renderer& renderer)
                 piece.value().draw(renderer);
         }
     }
+}
+
+void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected)
+{
+    for (auto& row : m_board)
+    {
+        for (auto& tile : row)
+        {
+            auto piece{ tile.getPiece() };
+            if (piece && SDL_PointInRect(&mousePosition, &tile.getPiece()->getRectangle()))
+            {
+                std::cout << "selected a piece\n";
+                tile.getPiece()->select();
+                pieceSelected = true;
+            }
+        }
+    }
+}
+
+void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
+{
+    for (auto& row : m_board)
+    {
+        for (auto& tile : row)
+        {
+            auto piece{ tile.getPiece() };
+            if (piece && piece->isSelected())
+            {
+                std::cout << "changing position\n";
+                tile.getPiece()->setPosition({ mousePosition.x, mousePosition.y });
+                tile.getPiece()->deselect();
+            }
+        }
+    }
+
+    pieceSelected = false;
+}
+
+std::array<std::array<Tile, 8>, 8>& Board::getTiles()
+{
+    return m_board;
 }
 
 void Board::initializeTile(TextureTable& table, int i, int j)

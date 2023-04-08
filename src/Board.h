@@ -14,6 +14,10 @@ public:
 
     void draw(Renderer& renderer);
 
+    void checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected);
+    void checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected);
+    std::array<std::array<Tile, 8>, 8>& getTiles();
+
 private:
     std::array<std::array<Tile, 8>, 8> m_board;
 
