@@ -129,6 +129,8 @@ bool MoveValidator::knightMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
         return false;
 
     // todo: check if king will be in check after knight move
+    // if (kingWillBeInCheck(...))
+    //     return false;
 
     auto piece{ board[newRow][newColumn].getPiece() };
     if (piece && piece->getColor() != knightColor)
@@ -139,6 +141,32 @@ bool MoveValidator::knightMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
     return true;
 }
 
+std::pair<int, int> getBishopDirection(int bishopRow, int bishopColumn,
+        int newRow, int newColumn)
+{
+    int rowDirection{ bishopRow < newRow ? 1 : -1 };
+    int columnDirection{ bishopColumn < newColumn ? 1 : -1 };
+    return { rowDirection, columnDirection };
+}
+
+bool bishopJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
+        int bishopRow, int bishopColumn, int newRow, int newColumn)
+{
+    auto [rowDirection, columnDirection]{
+        getBishopDirection(bishopRow, bishopColumn, newRow, newColumn) };
+
+    while (bishopRow + rowDirection != newRow)
+    {
+        if (board[bishopRow + rowDirection][bishopColumn + columnDirection].getPiece())
+            return true;
+
+        bishopRow += rowDirection;
+        bishopColumn += columnDirection;
+    }
+
+    return false;
+}
+
 bool MoveValidator::bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
         int bishopRow, int bishopColumn, int newRow, int newColumn, PieceColor bishopColor)
 {
@@ -146,6 +174,9 @@ bool MoveValidator::bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
         return false;
 
     // todo: check if king will be in check and if the bishop jumps over another piece or pawn
+
+    if (bishopJumpsOverPiece(board, bishopRow, bishopColumn, newRow, newColumn))
+        return false;
 
     auto piece{ board[newRow][newColumn].getPiece() };
     if (piece && piece->getColor() != bishopColor)
