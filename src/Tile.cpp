@@ -3,7 +3,7 @@
 #include "Constants.h"
 
 Tile::Tile(TileColor color, const std::optional<Piece>& piece, std::pair<int, int> position)
-    : m_color{ color }, m_piece{ piece }
+    : m_color{ color }, m_piece{ piece }, m_position{ position }
 {
     m_rectangle = { position.first, position.second, constants::windowWidth / constants::boardSize,
         constants::windowHeight / constants::boardSize };
@@ -35,4 +35,19 @@ const std::optional<Piece>& Tile::getPiece() const
 std::optional<Piece>& Tile::getPiece()
 {
     return m_piece;
+}
+
+std::pair<int, int> Tile::getPosition() const
+{
+    return m_position;
+}
+
+void Tile::removePiece()
+{
+    m_piece = std::nullopt;
+}
+
+void Tile::placePiece(const Piece& piece)
+{
+    m_piece = piece;
 }

@@ -22,11 +22,16 @@ public:
     DrawColor getConvertedColor() const;
     const std::optional<Piece>& getPiece() const;
     std::optional<Piece>& getPiece();
+    std::pair<int, int> getPosition() const;
+
+    void removePiece();
+    void placePiece(const Piece& piece);
 
 private:
     SDL_Rect m_rectangle{};
     TileColor m_color{};
     std::optional<Piece> m_piece{};
+    std::pair<int, int> m_position{};
 };
 
 #endif
