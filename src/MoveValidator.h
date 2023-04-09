@@ -13,7 +13,9 @@ public:
 
 private:
     static bool whitePawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
-            std::pair<int, int> piecePosition, std::pair<int, int> newPosition);
+            int pawnRow, int pawnColumn, int newRow, int newColumn);
+    static bool blackPawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            int pawnRow, int pawnColumn, int newRow, int newColumn);
 };
 
 #endif

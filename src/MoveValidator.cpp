@@ -9,12 +9,17 @@ bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const
         std::pair<int, int> newPosition)
 {
     auto piecePosition{ piece.getPosition() };
+    auto [pieceColumn, pieceRow]{ std::make_pair(piecePosition.first / 100,
+            piecePosition.second / 100) };
+    auto [newColumn, newRow]{ std::make_pair(newPosition.first / 100, newPosition.second / 100) };
+
     PieceType type{ piece.getType() };
     switch (type)
     {
         case PieceType::wPawn:
-            return whitePawnMoveIsValid(board, piecePosition, newPosition);
+            return whitePawnMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bPawn:
+            return blackPawnMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bKnight:
         case PieceType::wKnight:
         case PieceType::bBishop:
@@ -34,20 +39,13 @@ bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const
 }
 
 bool MoveValidator::whitePawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
-        std::pair<int, int> piecePosition, std::pair<int, int> newPosition)
+        int pawnRow, int pawnColumn, int newRow, int newColumn)
 {
-    // we don't update the board!!! that's the problem man..........
-    auto [pawnColumn, pawnRow]{ std::make_pair(piecePosition.first / 100,
-            piecePosition.second / 100) };
-    auto [newColumn, newRow]{ std::make_pair(newPosition.first / 100, newPosition.second / 100) };
-    std::cout << "new row and col: " << newRow << ' ' << newColumn << '\n';
-
     if (board[newRow][newColumn].getPiece())
     {
         // can't attack forward
         if (pawnColumn == newColumn)
             return false;
-        std::cout << "capturing or not\n";
         // a capture
         if (pawnRow - newRow == 1 && (pawnColumn - newColumn == 1 || pawnColumn - newColumn == -1))
         {
@@ -68,6 +66,40 @@ bool MoveValidator::whitePawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& boa
         if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow > 2)
             return false;
         if (pawnRow != constants::whitePawnStartRow && pawnRow - newRow == 1)
+            return true;
+
+        return false;
+    }
+}
+
+bool MoveValidator::blackPawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+        int pawnRow, int pawnColumn, int newRow, int newColumn)
+{
+    if (board[newRow][newColumn].getPiece())
+    {
+        // can't attack forward
+        if (pawnColumn == newColumn)
+            return false;
+        // a capture
+        if (newRow - pawnRow == 1 && (pawnColumn - newColumn == 1 || pawnColumn - newColumn == -1))
+        {
+            board[newRow][newColumn].removePiece();
+            return true;
+        }
+
+        return false;
+    }
+    // new tile doesn't have a piece
+    else
+    {
+        if (pawnColumn != newColumn)
+            return false;
+
+        if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow <= 2)
+            return true;
+        if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow > 2)
+            return false;
+        if (pawnRow != constants::blackPawnStartRow && newRow - pawnRow == 1)
             return true;
 
         return false;
