@@ -6,6 +6,8 @@
 #include "Tile.h"
 
 #include <array>
+#include <functional>
+#include <optional>
 
 class Board
 {
@@ -16,6 +18,7 @@ public:
 
     void checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected);
     void checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected);
+    std::optional<std::reference_wrapper<Tile>> findTile(std::pair<int, int> position);
     std::array<std::array<Tile, 8>, 8>& getTiles();
 
 private:
