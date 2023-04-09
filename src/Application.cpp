@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <cmath>
+#include <iostream>
 
 Application::Application()
     : m_window{ constants::windowWidth, constants::windowHeight }

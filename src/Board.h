@@ -1,6 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "MoveValidator.h"
 #include "Renderer.h"
 #include "TextureTable.h"
 #include "Tile.h"
@@ -23,6 +24,7 @@ public:
 
 private:
     std::array<std::array<Tile, 8>, 8> m_board;
+    MoveValidator m_validator;
 
     void initializeTile(TextureTable& table, int i, int j);
 };
