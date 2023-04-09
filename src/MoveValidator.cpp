@@ -75,7 +75,8 @@ bool MoveValidator::whitePawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& boa
         if (pawnColumn != newColumn)
             return false;
 
-        if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow <= 2)
+        if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow <= 2 &&
+                !board[pawnRow - 1][pawnColumn].getPiece())
             return true;
         if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow > 2)
             return false;
@@ -110,7 +111,8 @@ bool MoveValidator::blackPawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& boa
         if (pawnColumn != newColumn)
             return false;
 
-        if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow <= 2)
+        if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow <= 2 &&
+                !board[pawnRow + 1][pawnColumn].getPiece())
             return true;
         if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow > 2)
             return false;
@@ -236,7 +238,7 @@ bool MoveValidator::rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
     if (newRow - rookRow != 0 && newColumn - rookColumn != 0)
         return false;
 
-    // todo: check if king will be in check and if the rook jumps over another piece or pawn
+    // todo: check if king will be in check
     if (rookJumpsOverPiece(board, rookRow, rookColumn, newRow, newColumn))
         return false;
 
