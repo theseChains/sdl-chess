@@ -16,8 +16,12 @@ private:
             int pawnRow, int pawnColumn, int newRow, int newColumn);
     static bool blackPawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
             int pawnRow, int pawnColumn, int newRow, int newColumn);
-    static bool knightMoveIsValis(std::array<std::array<Tile, 8>, 8>& board,
+    static bool knightMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
             int knightRow, int knightColumn, int newRow, int newColumn);
+    static bool bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            int bishopRow, int bishopColumn, int newRow, int newColumn);
+    static bool rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            int rookRow, int rookColumn, int newRow, int newColumn);
 };
 
 #endif
