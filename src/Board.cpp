@@ -36,14 +36,24 @@ void Board::draw(Renderer& renderer)
     }
 }
 
-void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected)
+void changeCurrentMoveColor(PieceColor& color)
+{
+    if (color == PieceColor::white)
+        color = PieceColor::black;
+    else
+        color = PieceColor::white;
+}
+
+void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
+        PieceColor currentColorToMove)
 {
     for (auto& row : m_board)
     {
         for (auto& tile : row)
         {
             auto piece{ tile.getPiece() };
-            if (piece && SDL_PointInRect(&mousePosition, &piece->getRectangle()))
+            if (piece && SDL_PointInRect(&mousePosition, &piece->getRectangle()) &&
+                    piece->getColor() == currentColorToMove)
             {
                 tile.getPiece()->select();
                 pieceSelected = true;
@@ -73,7 +83,8 @@ std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> 
     return std::nullopt;
 }
 
-void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
+void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
+        PieceColor& currentColorToMove)
 {
     for (auto& row : m_board)
     {
@@ -92,6 +103,7 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
                 chosenTile->get().getPiece()->setPosition(newPosition);
                 chosenTile->get().getPiece()->deselect();
                 pieceSelected = false;
+                changeCurrentMoveColor(currentColorToMove);
                 return;
             }
             else if (piece && piece->isSelected())

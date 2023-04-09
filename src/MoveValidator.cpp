@@ -257,7 +257,7 @@ bool MoveValidator::kingMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
     if (std::abs(newRow - kingRow) > 1 || std::abs(newColumn - kingColumn) > 1)
         return false;
 
-    // todo: check if king will be in check and if the king is capturing a piece of the same color
+    // todo: check if king will be in check
 
     auto piece{ board[newRow][newColumn].getPiece() };
     if (piece && piece->getColor() != kingColor)

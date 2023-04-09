@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 #include "Board.h"
+#include "Colors.h"
 
 class UserInput
 {
@@ -15,6 +16,7 @@ public:
 private:
     SDL_Point m_mousePosition{};
     bool m_pieceSelected{ false };
+    PieceColor m_currentColorToMove{ PieceColor::white };
 };
 
 #endif

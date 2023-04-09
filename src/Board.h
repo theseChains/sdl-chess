@@ -1,7 +1,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "MoveValidator.h"
 #include "Renderer.h"
 #include "TextureTable.h"
 #include "Tile.h"
@@ -17,8 +16,10 @@ public:
 
     void draw(Renderer& renderer);
 
-    void checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected);
-    void checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected);
+    void checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
+            PieceColor curentColorToMove);
+    void checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
+            PieceColor& curentColorToMove);
     std::optional<std::reference_wrapper<Tile>> findTile(std::pair<int, int> position);
     std::array<std::array<Tile, 8>, 8>& getTiles();
 
