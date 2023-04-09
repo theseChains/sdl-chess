@@ -22,6 +22,7 @@ bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const
             return blackPawnMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bKnight:
         case PieceType::wKnight:
+            return knightMoveIsValis(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bBishop:
         case PieceType::wBishop:
         case PieceType::bRook:
@@ -104,4 +105,19 @@ bool MoveValidator::blackPawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& boa
 
         return false;
     }
+}
+
+bool MoveValidator::knightMoveIsValis(std::array<std::array<Tile, 8>, 8>& board,
+            int knightRow, int knightColumn, int newRow, int newColumn)
+{
+    if (!((std::abs(newRow - knightRow) == 2 && std::abs(newColumn - knightColumn) == 1) ||
+        (std::abs(newRow - knightRow) == 1 && std::abs(newColumn - knightColumn) == 2)))
+        return false;
+
+    // todo: check if king will be in check after knight move
+
+    if (board[newRow][newColumn].getPiece())
+        board[newRow][newColumn].removePiece();
+
+    return true;
 }
