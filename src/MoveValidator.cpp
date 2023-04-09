@@ -18,24 +18,31 @@ bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const
     {
         case PieceType::wPawn:
             return whitePawnMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+
         case PieceType::bPawn:
             return blackPawnMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+
         case PieceType::bKnight:
         case PieceType::wKnight:
             return knightMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+
         case PieceType::bBishop:
         case PieceType::wBishop:
             return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+
         case PieceType::bRook:
         case PieceType::wRook:
             return rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+
         case PieceType::bQueen:
         case PieceType::wQueen:
             return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn) ||
                 rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+
         case PieceType::bKing:
         case PieceType::wKing:
-            return true;
+            return kingMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+
         case PieceType::none:
             throw std::runtime_error{ "moveIsValid(): piece type none should not be checked" };
     }
@@ -147,6 +154,21 @@ bool MoveValidator::rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
         return false;
 
     // todo: check if king will be in check and if the rook jumps over another piece or pawn
+
+    if (board[newRow][newColumn].getPiece())
+        board[newRow][newColumn].removePiece();
+
+    return true;
+}
+
+bool MoveValidator::kingMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            int kingRow, int kingColumn, int newRow, int newColumn)
+{
+    if (std::abs(newRow - kingRow) > 1 || std::abs(newColumn - kingColumn) > 1)
+        return false;
+
+    // todo: check if king will be in check and if the king is capturing a piece of the same color
+    // also do that color check for every piece
 
     if (board[newRow][newColumn].getPiece())
         board[newRow][newColumn].removePiece();

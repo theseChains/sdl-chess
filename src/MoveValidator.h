@@ -22,6 +22,8 @@ private:
             int bishopRow, int bishopColumn, int newRow, int newColumn);
     static bool rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
             int rookRow, int rookColumn, int newRow, int newColumn);
+    static bool kingMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            int kingRow, int kingColumn, int newRow, int newColumn);
 };
 
 #endif
