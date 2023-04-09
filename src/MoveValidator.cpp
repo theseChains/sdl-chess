@@ -31,7 +31,8 @@ bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const
             return rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bQueen:
         case PieceType::wQueen:
-            // i think i can apply the bishop and rook rules here
+            return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn) ||
+                rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bKing:
         case PieceType::wKing:
             return true;
