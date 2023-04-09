@@ -1,20 +1,19 @@
 #include "MoveValidator.h"
 
+#include "Constants.h"
+
 #include <stdexcept>
 #include <iostream>
 
-MoveValidator::MoveValidator(const std::array<std::array<Tile, 8>, 8>& board) : m_board{ board }
-{
-}
-
-bool MoveValidator::moveIsValid(const Piece& piece, std::pair<int, int> newPosition)
+bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const Piece& piece,
+        std::pair<int, int> newPosition)
 {
     auto piecePosition{ piece.getPosition() };
     PieceType type{ piece.getType() };
     switch (type)
     {
         case PieceType::wPawn:
-            return whitePawnMoveIsValid(piecePosition, newPosition);
+            return whitePawnMoveIsValid(board, piecePosition, newPosition);
         case PieceType::bPawn:
         case PieceType::bKnight:
         case PieceType::wKnight:
@@ -34,18 +33,43 @@ bool MoveValidator::moveIsValid(const Piece& piece, std::pair<int, int> newPosit
     return true;
 }
 
-bool MoveValidator::whitePawnMoveIsValid(std::pair<int, int> piecePosition,
-        std::pair<int, int> newPosition)
+bool MoveValidator::whitePawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+        std::pair<int, int> piecePosition, std::pair<int, int> newPosition)
 {
-    auto [pieceColumn, pieceRow]{ std::make_pair(piecePosition.first / 100,
+    // we don't update the board!!! that's the problem man..........
+    auto [pawnColumn, pawnRow]{ std::make_pair(piecePosition.first / 100,
             piecePosition.second / 100) };
     auto [newColumn, newRow]{ std::make_pair(newPosition.first / 100, newPosition.second / 100) };
+    std::cout << "new row and col: " << newRow << ' ' << newColumn << '\n';
 
-    // wip
-    if (m_board[newRow][newColumn].getPiece())
+    if (board[newRow][newColumn].getPiece())
     {
+        // can't attack forward
+        if (pawnColumn == newColumn)
+            return false;
+        std::cout << "capturing or not\n";
+        // a capture
+        if (pawnRow - newRow == 1 && (pawnColumn - newColumn == 1 || pawnColumn - newColumn == -1))
+        {
+            board[newRow][newColumn].removePiece();
+            return true;
+        }
+
         return false;
     }
+    // new tile doesn't have a piece
+    else
+    {
+        if (pawnColumn != newColumn)
+            return false;
 
-    return true;
+        if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow <= 2)
+            return true;
+        if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow > 2)
+            return false;
+        if (pawnRow != constants::whitePawnStartRow && pawnRow - newRow == 1)
+            return true;
+
+        return false;
+    }
 }

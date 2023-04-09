@@ -8,16 +8,12 @@
 class MoveValidator
 {
 public:
-    // weird default constructor once again
-    MoveValidator() = default;
-    MoveValidator(const std::array<std::array<Tile, 8>, 8>& board);
-
-    bool moveIsValid(const Piece& piece, std::pair<int, int> newPosition);
+    static bool moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const Piece& piece,
+            std::pair<int, int> newPosition);
 
 private:
-    std::array<std::array<Tile, 8>, 8> m_board;
-
-    bool whitePawnMoveIsValid(std::pair<int, int> piecePosition, std::pair<int, int> newPosition);
+    static bool whitePawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            std::pair<int, int> piecePosition, std::pair<int, int> newPosition);
 };
 
 #endif
