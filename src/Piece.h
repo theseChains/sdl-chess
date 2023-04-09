@@ -19,6 +19,7 @@ public:
     SDL_Rect& getRectangle();
     PieceType getType() const;
     std::pair<int, int> getPosition() const;
+    PieceColor getColor() const;
 
     void setPosition(std::pair<int, int> position);
 

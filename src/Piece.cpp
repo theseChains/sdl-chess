@@ -36,6 +36,11 @@ std::pair<int, int> Piece::getPosition() const
     return m_position;
 }
 
+PieceColor Piece::getColor() const
+{
+    return m_color;
+}
+
 void Piece::select()
 {
     m_isSelected = true;
