@@ -1,6 +1,7 @@
 #include "Board.h"
 
 #include "Colors.h"
+#include "MoveValidator.h"
 #include "PieceArrangement.h"
 
 #include <iostream>
@@ -10,8 +11,6 @@ Board::Board(TextureTable& table)
     for (int i{ 0 }; i < 8; ++i)
         for (int j{ 0 }; j < 8; ++j)
             initializeTile(table, i, j);
-
-    m_validator = MoveValidator{ m_board };
 }
 
 void Board::draw(Renderer& renderer)
@@ -81,8 +80,8 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected)
         for (auto& tile : row)
         {
             auto piece{ tile.getPiece() };
-            if (piece && piece->isSelected() &&
-                    m_validator.moveIsValid(piece.value(), getSnappedBoardPosition(mousePosition)))
+            if (piece && piece->isSelected() && MoveValidator::moveIsValid(m_board,
+                        piece.value(), getSnappedBoardPosition(mousePosition)))
             {
                 auto newPosition{ getSnappedBoardPosition(mousePosition) };
                 // remove piece from old tile

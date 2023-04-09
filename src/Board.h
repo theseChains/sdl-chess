@@ -24,7 +24,6 @@ public:
 
 private:
     std::array<std::array<Tile, 8>, 8> m_board;
-    MoveValidator m_validator;
 
     void initializeTile(TextureTable& table, int i, int j);
 };
