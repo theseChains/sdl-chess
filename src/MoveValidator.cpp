@@ -28,7 +28,7 @@ bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const
             return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bRook:
         case PieceType::wRook:
-            // return rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
+            return rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn);
         case PieceType::bQueen:
         case PieceType::wQueen:
             // i think i can apply the bishop and rook rules here
@@ -132,6 +132,20 @@ bool MoveValidator::bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
         return false;
 
     // todo: check if king will be in check and if the bishop jumps over another piece or pawn
+
+    if (board[newRow][newColumn].getPiece())
+        board[newRow][newColumn].removePiece();
+
+    return true;
+}
+
+bool MoveValidator::rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            int rookRow, int rookColumn, int newRow, int newColumn)
+{
+    if (newRow - rookRow != 0 && newColumn - rookColumn != 0)
+        return false;
+
+    // todo: check if king will be in check and if the rook jumps over another piece or pawn
 
     if (board[newRow][newColumn].getPiece())
         board[newRow][newColumn].removePiece();
