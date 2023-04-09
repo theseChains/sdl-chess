@@ -141,8 +141,7 @@ bool MoveValidator::knightMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
     return true;
 }
 
-std::pair<int, int> getBishopDirection(int bishopRow, int bishopColumn,
-        int newRow, int newColumn)
+std::pair<int, int> getBishopDirection(int bishopRow, int bishopColumn, int newRow, int newColumn)
 {
     int rowDirection{ bishopRow < newRow ? 1 : -1 };
     int columnDirection{ bishopColumn < newColumn ? 1 : -1 };
@@ -173,7 +172,7 @@ bool MoveValidator::bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
     if (std::abs(newRow - bishopRow) != std::abs(newColumn - bishopColumn))
         return false;
 
-    // todo: check if king will be in check and if the bishop jumps over another piece or pawn
+    // todo: check if king will be in check
 
     if (bishopJumpsOverPiece(board, bishopRow, bishopColumn, newRow, newColumn))
         return false;
@@ -187,6 +186,50 @@ bool MoveValidator::bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
     return true;
 }
 
+std::pair<int, int> getRookDirection(int rookRow, int rookColumn, int newRow, int newColumn)
+{
+    if (rookRow != newRow)
+    {
+        int rowDirection{ rookRow < newRow ? 1 : -1 };
+        return { rowDirection, 0 };
+    }
+    else
+    {
+        int columnDirection{ rookColumn < newColumn ? 1 : -1 };
+        return { 0, columnDirection };
+    }
+}
+
+bool rookJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
+        int rookRow, int rookColumn, int newRow, int newColumn)
+{
+    auto [rowDirection, columnDirection]{
+        getRookDirection(rookRow, rookColumn, newRow, newColumn) };
+
+    if (rowDirection != 0)
+    {
+        while (rookRow + rowDirection != newRow)
+        {
+            if (board[rookRow + rowDirection][rookColumn].getPiece())
+                return true;
+
+            rookRow += rowDirection;
+        }
+    }
+    else if (columnDirection != 0)
+    {
+        while (rookColumn + columnDirection != newColumn)
+        {
+            if (board[rookRow][rookColumn + columnDirection].getPiece())
+                return true;
+
+            rookColumn += columnDirection;
+        }
+    }
+
+    return false;
+}
+
 bool MoveValidator::rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
             int rookRow, int rookColumn, int newRow, int newColumn, PieceColor rookColor)
 {
@@ -194,6 +237,8 @@ bool MoveValidator::rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
         return false;
 
     // todo: check if king will be in check and if the rook jumps over another piece or pawn
+    if (rookJumpsOverPiece(board, rookRow, rookColumn, newRow, newColumn))
+        return false;
 
     auto piece{ board[newRow][newColumn].getPiece() };
     if (piece && piece->getColor() != rookColor)
