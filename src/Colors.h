@@ -13,10 +13,9 @@ enum class PieceColor
 {
     white,
     black,
-    none
+    noColor
 };
 
 TileColor getTileColor(int x, int y);
-PieceColor getPieceColor(PieceType type);
 
 #endif

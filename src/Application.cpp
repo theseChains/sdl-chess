@@ -44,6 +44,20 @@ void Application::processInput(bool& keepRunning)
 
         m_userInput.handleEvent(event, m_board);
     }
+
+    //auto tiles{ m_board.getTiles() };
+    //for (const auto& row : tiles)
+    {
+        //for (const auto& tile : row)
+        {
+            //if (tile.getPiece())
+                //std::cout << 1 << ' ';
+            //else
+                //std::cout << 0 << ' ';
+        }
+        //std::cout << '\n';
+    }
+    //std::cout << '\n';
 }
 
 void Application::update()

@@ -91,10 +91,10 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
         for (auto& tile : row)
         {
             auto piece{ tile.getPiece() };
-            if (piece && piece->isSelected() && MoveValidator::moveIsValid(m_board,
-                        piece.value(), getSnappedBoardPosition(mousePosition)))
+            auto newPosition{ getSnappedBoardPosition(mousePosition) };
+            if (piece && piece->isSelected() &&
+                    MoveValidator::moveIsValid(m_board, piece.value(), newPosition))
             {
-                auto newPosition{ getSnappedBoardPosition(mousePosition) };
                 // remove piece from old tile
                 tile.removePiece();
                 // place piece at a chosen tile
@@ -123,12 +123,11 @@ std::array<std::array<Tile, 8>, 8>& Board::getTiles()
 
 void Board::initializeTile(TextureTable& table, int i, int j)
 {
-    PieceType type{ config::arrangement[i][j] };
+    auto [color, type]{ config::arrangement[i][j] };
     if (type == PieceType::none)
         m_board[i][j] = { getTileColor(i, j), std::nullopt, { j * 100, i * 100 } };
     else
     {
-        PieceColor color{ getPieceColor(type) };
         Piece piece{ type, color, table[{ color, type }], { j * 100, i * 100 } };
         m_board[i][j] = { getTileColor(i, j), piece, { j * 100, i * 100 } };
     }
