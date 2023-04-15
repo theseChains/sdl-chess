@@ -13,10 +13,8 @@ public:
             std::pair<int, int> newPosition);
 
 private:
-    static bool whitePawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
-            int pawnRow, int pawnColumn, int newRow, int newColumn);
-    static bool blackPawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
-            int pawnRow, int pawnColumn, int newRow, int newColumn);
+    static bool pawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+            int pawnRow, int pawnColumn, int newRow, int newColumn, PieceColor color);
     static bool knightMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
             int knightRow, int knightColumn, int newRow, int newColumn, PieceColor knightColor);
     static bool bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
