@@ -37,10 +37,7 @@ bool isKingInCheck(const std::array<std::array<Tile, 8>, 8>& board, PieceColor k
             // piece of different color can capture king
             if (piece && piece->getColor() != kingColor &&
                     MoveValidator::moveIsValid(board, piece.value(), kingRow, kingColumn))
-            {
-                auto [column, rows]{ piece->getPosition() };
                 return true;
-            }
         }
     }
 
@@ -60,6 +57,7 @@ bool kingWillBeInCheck(std::array<std::array<Tile, 8>, 8> board, const Piece& pi
     board[newRow][newColumn].removePiece();
     board[newRow][newColumn].placePiece(piece);
     // set the new position for the piece
+    // i gotta get rid of those 100's man...
     board[newRow][newColumn].getPiece()->setPosition({ newColumn * 100, newRow * 100 });
 
     PieceColor color{ piece.getColor() };
