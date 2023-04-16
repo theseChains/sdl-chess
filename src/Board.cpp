@@ -1,6 +1,7 @@
 #include "Board.h"
 
 #include "Colors.h"
+#include "KingCheckLogic.h"
 #include "MoveValidator.h"
 #include "PieceArrangement.h"
 
@@ -92,11 +93,17 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
         {
             auto piece{ tile.getPiece() };
             auto newPosition{ getSnappedBoardPosition(mousePosition) };
+            auto [newColumn, newRow]{ std::make_pair(newPosition.first / 100,
+                    newPosition.second / 100) };
+
             if (piece && piece->isSelected() &&
-                    MoveValidator::moveIsValid(m_board, piece.value(), newPosition))
+                    MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) &&
+                    !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
             {
                 // remove piece from old tile
                 tile.removePiece();
+                // remove piece from new tile (if there was one)
+                m_board[newRow][newColumn].removePiece();
                 // place piece at a chosen tile
                 auto chosenTile{ findTile(newPosition) };
                 chosenTile->get().placePiece(piece.value());

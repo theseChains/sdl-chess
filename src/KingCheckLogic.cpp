@@ -1,5 +1,7 @@
 #include "KingCheckLogic.h"
 
+#include "MoveValidator.h"
+
 std::pair<int, int> findKingPosition(const std::array<std::array<Tile, 8>, 8>& board,
         PieceColor kingColor)
 {
@@ -12,6 +14,7 @@ std::pair<int, int> findKingPosition(const std::array<std::array<Tile, 8>, 8>& b
             if (piece && piece->getType() == PieceType::king && piece->getColor() == kingColor)
             {
                 auto position{ piece->getPosition() };
+                // positions are still kinda messed up i guess
                 kingPosition = { position.second / 100, position.first / 100 };
                 break;
             }
@@ -21,23 +24,31 @@ std::pair<int, int> findKingPosition(const std::array<std::array<Tile, 8>, 8>& b
     return kingPosition;
 }
 
-bool rookOrQueenAttacksKing(const std::array<std::array<Tile, 8>, 8>& board, int kingRow,
-        int kingColumn, PieceColor kingColor)
-{
-    return false;
-}
-
 bool isKingInCheck(const std::array<std::array<Tile, 8>, 8>& board, PieceColor kingColor)
 {
     auto [kingRow, kingColumn]{ findKingPosition(board, kingColor) };
-    return rookOrQueenAttacksKing(board, kingRow, kingColumn, kingColor);
+    for (const auto& row : board)
+    {
+        for (const auto& tile : row)
+        {
+            auto piece{ tile.getPiece() };
+            // piece of different color can capture king
+            if (piece && piece->getColor() != kingColor &&
+                    MoveValidator::moveIsValid(board, piece.value(), kingRow, kingColumn))
+                return true;
+        }
+    }
+
+    return false;
 }
 
-bool willKingBeInCheck(std::array<std::array<Tile, 8>, 8> board, int pieceRow, int pieceColumn,
+bool kingWillBeInCheck(std::array<std::array<Tile, 8>, 8> board, const Piece& piece,
         int newRow, int newColumn)
 {
+    auto piecePosition{ piece.getPosition() };
+    auto [pieceColumn, pieceRow]{ std::make_pair(piecePosition.first / 100,
+            piecePosition.second / 100) };
     // place the piece at the new spot and check if the king is in check
-    Piece piece{ board[pieceRow][pieceColumn].getPiece().value() };
     board[pieceRow][pieceColumn].removePiece();
     // i think i should also remove a piece from newRow newColumn if there is a piece there
     board[newRow][newColumn].placePiece(piece);

@@ -1,18 +1,16 @@
 #include "MoveValidator.h"
 
 #include "Constants.h"
-#include "KingCheckLogic.h"
 
 #include <stdexcept>
 #include <iostream>
 
-bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const Piece& piece,
-        std::pair<int, int> newPosition)
+bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board, const Piece& piece,
+        int newRow, int newColumn)
 {
     auto piecePosition{ piece.getPosition() };
     auto [pieceColumn, pieceRow]{ std::make_pair(piecePosition.first / 100,
             piecePosition.second / 100) };
-    auto [newColumn, newRow]{ std::make_pair(newPosition.first / 100, newPosition.second / 100) };
     PieceColor color{ piece.getColor() };
 
     PieceType type{ piece.getType() };
@@ -44,28 +42,7 @@ bool MoveValidator::moveIsValid(std::array<std::array<Tile, 8>, 8>& board, const
     return true;
 }
 
-bool checkKingLine(const std::array<std::array<Tile, 8>, 8>& board, int kingRow, int kingColumn,
-        int rowOffset, int columnOffset, PieceColor kingColor)
-{
-    auto piece{ board[kingRow + rowOffset][kingColumn + columnOffset].getPiece() };
-    PieceType type{ piece->getType() };
-
-    // no rook or queen can attack, king blocked by a piece of the same color
-    if (piece && piece->getColor() == kingColor)
-        return false;
-
-    // no rook or queen can attack, king blocked by a non-attacking piece
-    if (piece && type != PieceType::rook && type != PieceType::queen)
-        return false;
-
-    if (piece && kingColor != piece->getColor() && (type == PieceType::rook ||
-            type == PieceType::queen))
-        return true;
-
-    return false;
-}
-
-bool MoveValidator::pawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
         int pawnRow, int pawnColumn, int newRow, int newColumn, PieceColor color)
 {
     // todo: make a less lazy version of separating pawn move validation by color
@@ -77,11 +54,13 @@ bool MoveValidator::pawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
             // can't attack forward
             if (pawnColumn == newColumn)
                 return false;
+
             // a capture
             if (pawnRow - newRow == 1 && (pawnColumn - newColumn == 1 ||
                     pawnColumn - newColumn == -1))
             {
-                board[newRow][newColumn].removePiece();
+                // don't think this was ever necessary, we'll see
+                // board[newRow][newColumn].removePiece();
                 return true;
             }
 
@@ -113,11 +92,12 @@ bool MoveValidator::pawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
             // can't attack forward
             if (pawnColumn == newColumn)
                 return false;
+
             // a capture
             if (newRow - pawnRow == 1 && (pawnColumn - newColumn == 1 ||
                     pawnColumn - newColumn == -1))
             {
-                board[newRow][newColumn].removePiece();
+                // board[newRow][newColumn].removePiece();
                 return true;
             }
 
@@ -142,20 +122,16 @@ bool MoveValidator::pawnMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
     }
 }
 
-bool MoveValidator::knightMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+bool MoveValidator::knightMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
         int knightRow, int knightColumn, int newRow, int newColumn, PieceColor knightColor)
 {
     if (!((std::abs(newRow - knightRow) == 2 && std::abs(newColumn - knightColumn) == 1) ||
         (std::abs(newRow - knightRow) == 1 && std::abs(newColumn - knightColumn) == 2)))
         return false;
 
-    if (willKingBeInCheck(board, knightRow, knightColumn, newRow, newColumn))
-        return false;
-
     auto piece{ board[newRow][newColumn].getPiece() };
-    if (piece && piece->getColor() != knightColor)
-        board[newRow][newColumn].removePiece();
-    else if (piece && piece->getColor() == knightColor)
+    // a piece of the same color stands on the new row and column
+    if (piece && piece->getColor() == knightColor)
         return false;
 
     return true;
@@ -186,22 +162,18 @@ bool bishopJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
     return false;
 }
 
-bool MoveValidator::bishopMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+bool MoveValidator::bishopMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
         int bishopRow, int bishopColumn, int newRow, int newColumn, PieceColor bishopColor)
 {
     if (std::abs(newRow - bishopRow) != std::abs(newColumn - bishopColumn))
-        return false;
-
-    if (willKingBeInCheck(board, bishopRow, bishopColumn, newRow, newColumn))
         return false;
 
     if (bishopJumpsOverPiece(board, bishopRow, bishopColumn, newRow, newColumn))
         return false;
 
     auto piece{ board[newRow][newColumn].getPiece() };
-    if (piece && piece->getColor() != bishopColor)
-        board[newRow][newColumn].removePiece();
-    else if (piece && piece->getColor() == bishopColor)
+    // a piece of the same color stands on the new row and column
+    if (piece && piece->getColor() == bishopColor)
         return false;
 
     return true;
@@ -251,42 +223,32 @@ bool rookJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
     return false;
 }
 
-bool MoveValidator::rookMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+bool MoveValidator::rookMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
             int rookRow, int rookColumn, int newRow, int newColumn, PieceColor rookColor)
 {
     if (newRow - rookRow != 0 && newColumn - rookColumn != 0)
-        return false;
-
-    // basically change this according by also passing the color of the piece here,
-    // otherwise stuff won't work as you won't be able to give checks with proper pieces at all
-    if (willKingBeInCheck(board, rookRow, rookColumn, newRow, newColumn))
         return false;
 
     if (rookJumpsOverPiece(board, rookRow, rookColumn, newRow, newColumn))
         return false;
 
     auto piece{ board[newRow][newColumn].getPiece() };
-    if (piece && piece->getColor() != rookColor)
-        board[newRow][newColumn].removePiece();
-    else if (piece && piece->getColor() == rookColor)
+    // a piece of the same color stands on the new row and column
+    if (piece && piece->getColor() == rookColor)
         return false;
 
     return true;
 }
 
-bool MoveValidator::kingMoveIsValid(std::array<std::array<Tile, 8>, 8>& board,
+bool MoveValidator::kingMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
             int kingRow, int kingColumn, int newRow, int newColumn, PieceColor kingColor)
 {
     if (std::abs(newRow - kingRow) > 1 || std::abs(newColumn - kingColumn) > 1)
         return false;
 
-    if (willKingBeInCheck(board, kingRow, kingColumn, newRow, newColumn))
-        return false;
-
     auto piece{ board[newRow][newColumn].getPiece() };
-    if (piece && piece->getColor() != kingColor)
-        board[newRow][newColumn].removePiece();
-    else if (piece && piece->getColor() == kingColor)
+    // a piece of the same color stands on the new row and column
+    if (piece && piece->getColor() == kingColor)
         return false;
 
     return true;

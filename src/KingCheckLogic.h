@@ -13,7 +13,7 @@ bool rookOrQueenAttacksKing(const std::array<std::array<Tile, 8>, 8>& board, int
         int kingColumn, PieceColor kingColor);
 bool isKingInCheck(const std::array<std::array<Tile, 8>, 8>& board, PieceColor kingColor);
 // pass a copy of the board to see if the king will be in check after moving a piece to a new spot
-bool willKingBeInCheck(std::array<std::array<Tile, 8>, 8> board, int pieceRow, int pieceColumn,
+bool kingWillBeInCheck(std::array<std::array<Tile, 8>, 8> board, const Piece& piece,
         int newRow, int newColumn);
 
 #endif
