@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <iostream>
 
-bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board, const Piece& piece,
-        int newRow, int newColumn)
+bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
+        const Piece& piece, int newRow, int newColumn)
 {
     auto piecePosition{ piece.getPosition() };
     auto [pieceColumn, pieceRow]{ std::make_pair(piecePosition.first / 100,
@@ -58,11 +58,7 @@ bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
             // a capture
             if (pawnRow - newRow == 1 && (pawnColumn - newColumn == 1 ||
                     pawnColumn - newColumn == -1))
-            {
-                // don't think this was ever necessary, we'll see
-                // board[newRow][newColumn].removePiece();
                 return true;
-            }
 
             return false;
         }
@@ -96,10 +92,7 @@ bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
             // a capture
             if (newRow - pawnRow == 1 && (pawnColumn - newColumn == 1 ||
                     pawnColumn - newColumn == -1))
-            {
-                // board[newRow][newColumn].removePiece();
                 return true;
-            }
 
             return false;
         }

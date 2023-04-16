@@ -102,7 +102,7 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
             {
                 // remove piece from old tile
                 tile.removePiece();
-                // remove piece from new tile (if there was one)
+                // remove piece from new tile (in case of capturing)
                 m_board[newRow][newColumn].removePiece();
                 // place piece at a chosen tile
                 auto chosenTile{ findTile(newPosition) };
