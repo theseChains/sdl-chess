@@ -29,7 +29,6 @@ std::pair<int, int> findKingPosition(const std::array<std::array<Tile, 8>, 8>& b
 bool isKingInCheck(const std::array<std::array<Tile, 8>, 8>& board, PieceColor kingColor)
 {
     auto [kingRow, kingColumn]{ findKingPosition(board, kingColor) };
-    std::cout << "king row col " << kingRow << ' ' << kingColumn << '\n';
     for (const auto& row : board)
     {
         for (const auto& tile : row)
