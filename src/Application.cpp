@@ -20,7 +20,6 @@ void Application::run()
         auto start{ SDL_GetPerformanceCounter() };
 
         processInput(keepRunning);
-        update();
         draw();
 
         auto end{ SDL_GetPerformanceCounter() };
@@ -44,10 +43,6 @@ void Application::processInput(bool& keepRunning)
 
         m_userInput.handleEvent(event, m_board);
     }
-}
-
-void Application::update()
-{
 }
 
 void Application::draw()

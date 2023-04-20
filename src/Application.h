@@ -26,7 +26,6 @@ private:
     UserInput m_userInput;
 
     void processInput(bool& keepRunning);
-    void update();
     void draw();
 };
 
