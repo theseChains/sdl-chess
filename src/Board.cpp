@@ -66,7 +66,12 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
 
 std::pair<int, int> getSnappedBoardPosition(SDL_Point mousePosition)
 {
-    // exception if user clicks on [0, y] or [x, 0] but whatever
+    // in case user clicks on the edge of the screen
+    if (mousePosition.x == 0)
+        mousePosition.x = 1;
+    if (mousePosition.y == 0)
+        mousePosition.y = 1;
+
     return { mousePosition.x / 100 * 100, mousePosition.y / 100 * 100 };
 }
 
