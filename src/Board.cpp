@@ -93,7 +93,6 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
         PieceColor& currentColorToMove)
 {
     auto [newRow, newColumn]{ getBoardPositionFromMouse(mousePosition) };
-    std::cout << "new row and col: " << newRow << ' ' << newColumn << '\n';
 
     for (auto& row : m_board)
     {
