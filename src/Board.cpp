@@ -64,7 +64,7 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
     }
 }
 
-std::pair<int, int> getSnappedBoardPosition(SDL_Point mousePosition)
+std::pair<int, int> getBoardPositionFromMouse(SDL_Point mousePosition)
 {
     // in case user clicks on the edge of the screen
     if (mousePosition.x == 0)
@@ -72,7 +72,7 @@ std::pair<int, int> getSnappedBoardPosition(SDL_Point mousePosition)
     if (mousePosition.y == 0)
         mousePosition.y = 1;
 
-    return { mousePosition.x / 100 * 100, mousePosition.y / 100 * 100 };
+    return { mousePosition.y / 100, mousePosition.x / 100 };
 }
 
 std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> position)
@@ -92,14 +92,14 @@ std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> 
 void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
         PieceColor& currentColorToMove)
 {
+    auto [newRow, newColumn]{ getBoardPositionFromMouse(mousePosition) };
+    std::cout << "new row and col: " << newRow << ' ' << newColumn << '\n';
+
     for (auto& row : m_board)
     {
         for (auto& tile : row)
         {
             auto piece{ tile.getPiece() };
-            auto newPosition{ getSnappedBoardPosition(mousePosition) };
-            auto [newColumn, newRow]{ std::make_pair(newPosition.first / 100,
-                    newPosition.second / 100) };
 
             if (piece && piece->isSelected() &&
                     MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) &&
@@ -110,9 +110,9 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
                 // remove piece from new tile (in case of capturing)
                 m_board[newRow][newColumn].removePiece();
                 // place piece at a chosen tile
-                auto chosenTile{ findTile(newPosition) };
+                auto chosenTile{ findTile({ newRow * 100, newColumn * 100 }) };
                 chosenTile->get().placePiece(piece.value());
-                chosenTile->get().getPiece()->setPosition(newPosition);
+                chosenTile->get().getPiece()->setBoardPosition({ newRow, newColumn });
                 chosenTile->get().getPiece()->deselect();
                 pieceSelected = false;
                 changeCurrentMoveColor(currentColorToMove);
@@ -136,11 +136,14 @@ std::array<std::array<Tile, 8>, 8>& Board::getTiles()
 void Board::initializeTile(TextureTable& table, int i, int j)
 {
     auto [color, type]{ config::arrangement[i][j] };
+    TileColor tileColor{ getTileColor(i, j) };
+    auto [tileRow, tileColumn]{ std::make_pair(i * 100, j * 100) };
+
     if (type == PieceType::none)
-        m_board[i][j] = { getTileColor(i, j), std::nullopt, { j * 100, i * 100 } };
+        m_board[i][j] = { tileColor, std::nullopt, { tileRow, tileColumn } };
     else
     {
-        Piece piece{ type, color, table[{ color, type }], { j * 100, i * 100 } };
-        m_board[i][j] = { getTileColor(i, j), piece, { j * 100, i * 100 } };
+        Piece piece{ type, color, table[{ color, type }], { tileRow, tileColumn } };
+        m_board[i][j] = { tileColor, piece, { tileRow, tileColumn } };
     }
 }

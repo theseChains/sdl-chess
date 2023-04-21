@@ -6,7 +6,7 @@
 
 #include <array>
 
-std::pair<int, int> findKingPosition(const std::array<std::array<Tile, 8>, 8>& board,
+std::optional<std::pair<int, int>> findKingPosition(const std::array<std::array<Tile, 8>, 8>& board,
         PieceColor kingColor);
 
 bool rookOrQueenAttacksKing(const std::array<std::array<Tile, 8>, 8>& board, int kingRow,

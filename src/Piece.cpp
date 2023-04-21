@@ -5,7 +5,8 @@
 Piece::Piece(PieceType type, PieceColor color, SDL_Texture* texture, std::pair<int, int> position)
     : m_type{ type }, m_color{ color}, m_texture{ texture }, m_position{ position }
 {
-    m_rectangle = { position.first, position.second, constants::windowWidth / constants::boardSize,
+    // switch x and y for rectangle position
+    m_rectangle = { position.second, position.first, constants::windowWidth / constants::boardSize,
         constants::windowHeight / constants::boardSize };
 }
 
@@ -22,8 +23,17 @@ SDL_Rect& Piece::getRectangle()
 void Piece::setPosition(std::pair<int, int> position)
 {
     m_position = position;
-    m_rectangle.x = position.first;
-    m_rectangle.y = position.second;
+    // switch the order for proper rendering
+    m_rectangle.x = position.second;
+    m_rectangle.y = position.first;
+}
+
+void Piece::setBoardPosition(std::pair<int, int> position)
+{
+    m_position = { position.first * 100, position.second * 100 };
+    // switch the order for proper rendering
+    m_rectangle.x = position.second * 100;
+    m_rectangle.y = position.first * 100;
 }
 
 PieceType Piece::getType() const
@@ -34,6 +44,11 @@ PieceType Piece::getType() const
 std::pair<int, int> Piece::getPosition() const
 {
     return m_position;
+}
+
+std::pair<int, int> Piece::getBoardPosition() const
+{
+    return { m_position.first / 100, m_position.second / 100 };
 }
 
 PieceColor Piece::getColor() const

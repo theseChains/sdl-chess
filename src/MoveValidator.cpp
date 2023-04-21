@@ -8,9 +8,7 @@
 bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
         const Piece& piece, int newRow, int newColumn)
 {
-    auto piecePosition{ piece.getPosition() };
-    auto [pieceColumn, pieceRow]{ std::make_pair(piecePosition.first / 100,
-            piecePosition.second / 100) };
+    auto [pieceRow, pieceColumn]{ piece.getBoardPosition() };
     PieceColor color{ piece.getColor() };
 
     PieceType type{ piece.getType() };
@@ -237,12 +235,17 @@ bool MoveValidator::kingMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
             int kingRow, int kingColumn, int newRow, int newColumn, PieceColor kingColor)
 {
     if (std::abs(newRow - kingRow) > 1 || std::abs(newColumn - kingColumn) > 1)
+    {
+        std::cout << "king move invalid by rules\n";
         return false;
+    }
 
     auto piece{ board[newRow][newColumn].getPiece() };
     // a piece of the same color stands on the new row and column
     if (piece && piece->getColor() == kingColor)
         return false;
+
+    std::cout << "king move is valid\n";
 
     return true;
 }

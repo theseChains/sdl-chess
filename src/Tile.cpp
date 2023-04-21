@@ -5,7 +5,8 @@
 Tile::Tile(TileColor color, const std::optional<Piece>& piece, std::pair<int, int> position)
     : m_color{ color }, m_piece{ piece }, m_position{ position }
 {
-    m_rectangle = { position.first, position.second, constants::windowWidth / constants::boardSize,
+    // switch the x and y for rectangle position
+    m_rectangle = { position.second, position.first, constants::windowWidth / constants::boardSize,
         constants::windowHeight / constants::boardSize };
 }
 
