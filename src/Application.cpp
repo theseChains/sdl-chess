@@ -5,7 +5,7 @@
 
 Application::Application()
     : m_window{ constants::windowWidth, constants::windowHeight }
-    , m_renderer{ m_window.getWindow(), -1, SDL_RENDERER_SOFTWARE }
+    , m_renderer{ m_window.getWindow(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE }
     , m_textures{ m_renderer }
     , m_board{ m_textures }
     , m_userInput{}
@@ -17,16 +17,8 @@ void Application::run()
     bool keepRunning{ true };
     while (keepRunning)
     {
-        auto start{ SDL_GetPerformanceCounter() };
-
         processInput(keepRunning);
         draw();
-
-        auto end{ SDL_GetPerformanceCounter() };
-        float elapsed{ static_cast<float>(end - start) /
-            static_cast<float>(SDL_GetPerformanceFrequency()) * 1000.0f };
-        // cap to 60 fps
-        SDL_Delay(static_cast<int>(std::floor(16.666f - elapsed)));
     }
 }
 
