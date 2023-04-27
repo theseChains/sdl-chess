@@ -2,6 +2,7 @@
 
 #include "Colors.h"
 #include "KingCheckLogic.h"
+#include "KingMateLogic.h"
 #include "MoveValidator.h"
 #include "PieceArrangement.h"
 
@@ -94,6 +95,9 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
 {
     auto [newRow, newColumn]{ getBoardPositionFromMouse(mousePosition) };
 
+    if (currentColorToMove == PieceColor::noColor)
+        return;
+
     for (auto& row : m_board)
     {
         for (auto& tile : row)
@@ -108,6 +112,7 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
                 tile.removePiece();
                 // remove piece from new tile (in case of capturing)
                 m_board[newRow][newColumn].removePiece();
+
                 // place piece at a chosen tile
                 auto chosenTile{ findTile({ newRow * 100, newColumn * 100 }) };
                 chosenTile->get().placePiece(piece.value());
@@ -115,6 +120,12 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
                 chosenTile->get().getPiece()->deselect();
                 pieceSelected = false;
                 changeCurrentMoveColor(currentColorToMove);
+                if (isKingCheckmated(m_board, currentColorToMove))
+                {
+                    std::cout << "king is checkmated\n";
+                    currentColorToMove = PieceColor::noColor;
+                }
+
                 return;
             }
             else if (piece && piece->isSelected())
