@@ -119,10 +119,16 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
                 chosenTile->get().getPiece()->setBoardPosition({ newRow, newColumn });
                 chosenTile->get().getPiece()->deselect();
                 pieceSelected = false;
+
+                // change the color, then check for checkmate
                 changeCurrentMoveColor(currentColorToMove);
                 if (isKingCheckmated(m_board, currentColorToMove))
                 {
-                    std::cout << "king is checkmated\n";
+                    if (currentColorToMove == PieceColor::white)
+                        std::cout << "white king is checkmated, black wins!\n";
+                    else
+                        std::cout << "black king is checkmated, white wins!\n";
+
                     currentColorToMove = PieceColor::noColor;
                 }
 
