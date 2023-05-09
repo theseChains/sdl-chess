@@ -46,25 +46,6 @@ void changeCurrentMoveColor(PieceColor& color)
         color = PieceColor::white;
 }
 
-void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
-        PieceColor currentColorToMove)
-{
-    for (auto& row : m_board)
-    {
-        for (auto& tile : row)
-        {
-            auto piece{ tile.getPiece() };
-            if (piece && SDL_PointInRect(&mousePosition, &piece->getRectangle()) &&
-                    piece->getColor() == currentColorToMove)
-            {
-                tile.getPiece()->select();
-                pieceSelected = true;
-                return;
-            }
-        }
-    }
-}
-
 std::pair<int, int> getBoardPositionFromMouse(SDL_Point mousePosition)
 {
     // in case user clicks on the edge of the screen
@@ -74,6 +55,19 @@ std::pair<int, int> getBoardPositionFromMouse(SDL_Point mousePosition)
         mousePosition.y = 1;
 
     return { mousePosition.y / 100, mousePosition.x / 100 };
+}
+
+void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
+        PieceColor currentColorToMove)
+{
+    auto [boardRow, boardColumn]{ getBoardPositionFromMouse(mousePosition) };
+    auto tile{ findTile({ boardRow * 100, boardColumn * 100 }) };
+    auto piece{ tile->get().getPiece() };
+    if (piece && piece->getColor() == currentColorToMove)
+    {
+        tile->get().getPiece()->select();
+        pieceSelected = true;
+    }
 }
 
 std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> position)
@@ -97,6 +91,12 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
 
     if (currentColorToMove == PieceColor::noColor)
         return;
+
+    // it might be better to just find the selected piece based on the new row and new column
+    // so that we don't have to iterate through the board each time
+    // also might be better to do this for the piece selection part too, just calculate the
+    // row and column with the getBoardPositionFromMouse() function and select/deselect the
+    // piece that is located there
 
     for (auto& row : m_board)
     {
