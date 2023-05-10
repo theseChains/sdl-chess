@@ -26,6 +26,7 @@ void Board::draw(Renderer& renderer)
         }
     }
 
+    // русский комментарий
     // render pieces on top of the board
     for (int i{ 0 }; i < 8; ++i)
     {
@@ -87,16 +88,10 @@ std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> 
 void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
         PieceColor& currentColorToMove)
 {
-    auto [newRow, newColumn]{ getBoardPositionFromMouse(mousePosition) };
-
     if (currentColorToMove == PieceColor::noColor)
         return;
 
-    // it might be better to just find the selected piece based on the new row and new column
-    // so that we don't have to iterate through the board each time
-    // also might be better to do this for the piece selection part too, just calculate the
-    // row and column with the getBoardPositionFromMouse() function and select/deselect the
-    // piece that is located there
+    auto [newRow, newColumn]{ getBoardPositionFromMouse(mousePosition) };
 
     for (auto& row : m_board)
     {
