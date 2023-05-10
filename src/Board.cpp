@@ -26,7 +26,6 @@ void Board::draw(Renderer& renderer)
         }
     }
 
-    // русский комментарий
     // render pieces on top of the board
     for (int i{ 0 }; i < 8; ++i)
     {
