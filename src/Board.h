@@ -27,6 +27,9 @@ private:
     std::array<std::array<Tile, 8>, 8> m_board;
 
     void initializeTile(TextureTable& table, int i, int j);
+    void placePieceAtChosenTile(int newRow, int newColumn, const std::optional<Piece>& piece);
+    void checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColumn,
+            bool& pieceSelected, PieceColor& currentColorToMove);
 };
 
 #endif

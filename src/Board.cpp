@@ -84,6 +84,52 @@ std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> 
     return std::nullopt;
 }
 
+void Board::placePieceAtChosenTile(int newRow, int newColumn, const std::optional<Piece>& piece)
+{
+    auto chosenTile{ findTile({ newRow * 100, newColumn * 100 }) };
+    chosenTile->get().placePiece(piece.value());
+    chosenTile->get().getPiece()->setBoardPosition({ newRow, newColumn });
+    chosenTile->get().getPiece()->deselect();
+}
+
+void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColumn,
+        bool& pieceSelected, PieceColor& currentColorToMove)
+{
+    auto piece{ tile.getPiece() };
+
+    if (piece && piece->isSelected() &&
+            MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) &&
+            !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
+    {
+        // remove piece from old tile
+        tile.removePiece();
+        // remove piece from new tile (in case of capturing)
+        m_board[newRow][newColumn].removePiece();
+        placePieceAtChosenTile(newRow, newColumn, piece);
+        pieceSelected = false;
+
+        // change the color, then check for checkmate
+        changeCurrentMoveColor(currentColorToMove);
+        if (isKingCheckmated(m_board, currentColorToMove))
+        {
+            if (currentColorToMove == PieceColor::white)
+                std::cout << "white king is checkmated, black wins!\n";
+            else
+                std::cout << "black king is checkmated, white wins!\n";
+
+            currentColorToMove = PieceColor::noColor;
+        }
+
+        keepGoing = false;
+    }
+    else if (piece && piece->isSelected())
+    {
+        tile.getPiece()->deselect();
+        pieceSelected = false;
+        keepGoing = false;
+    }
+}
+
 void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
         PieceColor& currentColorToMove)
 {
@@ -96,44 +142,11 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
     {
         for (auto& tile : row)
         {
-            auto piece{ tile.getPiece() };
-
-            if (piece && piece->isSelected() &&
-                    MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) &&
-                    !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
-            {
-                // remove piece from old tile
-                tile.removePiece();
-                // remove piece from new tile (in case of capturing)
-                m_board[newRow][newColumn].removePiece();
-
-                // place piece at a chosen tile
-                auto chosenTile{ findTile({ newRow * 100, newColumn * 100 }) };
-                chosenTile->get().placePiece(piece.value());
-                chosenTile->get().getPiece()->setBoardPosition({ newRow, newColumn });
-                chosenTile->get().getPiece()->deselect();
-                pieceSelected = false;
-
-                // change the color, then check for checkmate
-                changeCurrentMoveColor(currentColorToMove);
-                if (isKingCheckmated(m_board, currentColorToMove))
-                {
-                    if (currentColorToMove == PieceColor::white)
-                        std::cout << "white king is checkmated, black wins!\n";
-                    else
-                        std::cout << "black king is checkmated, white wins!\n";
-
-                    currentColorToMove = PieceColor::noColor;
-                }
-
+            // bit of a hack i guess..
+            bool keepGoing = true;
+            checkBoardTile(tile, keepGoing, newRow, newColumn, pieceSelected, currentColorToMove);
+            if (!keepGoing)
                 return;
-            }
-            else if (piece && piece->isSelected())
-            {
-                tile.getPiece()->deselect();
-                pieceSelected = false;
-                return;
-            }
         }
     }
 }
