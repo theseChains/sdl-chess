@@ -45,6 +45,7 @@ bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
 bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
         int pawnRow, int pawnColumn, int newRow, int newColumn, PieceColor color)
 {
+    // checkForEnPassant();
     // todo: make a less lazy version of separating pawn move validation by color
     // also todo: fix moving backwards lol
     if (color == PieceColor::white)
@@ -69,6 +70,8 @@ bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
             if (pawnColumn != newColumn)
                 return false;
 
+            if (newRow > pawnRow)
+                return false;
             if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow <= 2 &&
                     !board[pawnRow - 1][pawnColumn].getPiece())
                 return true;
@@ -103,6 +106,8 @@ bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
             if (pawnColumn != newColumn)
                 return false;
 
+            if (newRow < pawnRow)
+                return false;
             if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow <= 2 &&
                     !board[pawnRow + 1][pawnColumn].getPiece())
                 return true;
