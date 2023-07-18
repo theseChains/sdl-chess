@@ -1,6 +1,8 @@
 #include "MoveValidator.h"
 
 #include "Constants.h"
+#include "KingCastleLogic.h"
+#include "KingCheckLogic.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -44,6 +46,7 @@ bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
         int pawnRow, int pawnColumn, int newRow, int newColumn, PieceColor color)
 {
     // todo: make a less lazy version of separating pawn move validation by color
+    // also todo: fix moving backwards lol
     if (color == PieceColor::white)
     {
         auto piece{ board[newRow][newColumn].getPiece() };
@@ -215,7 +218,7 @@ bool rookJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
 }
 
 bool MoveValidator::rookMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-            int rookRow, int rookColumn, int newRow, int newColumn, PieceColor rookColor)
+        int rookRow, int rookColumn, int newRow, int newColumn, PieceColor rookColor)
 {
     if (newRow - rookRow != 0 && newColumn - rookColumn != 0)
         return false;
@@ -232,8 +235,11 @@ bool MoveValidator::rookMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
 }
 
 bool MoveValidator::kingMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-            int kingRow, int kingColumn, int newRow, int newColumn, PieceColor kingColor)
+        int kingRow, int kingColumn, int newRow, int newColumn, PieceColor kingColor)
 {
+    if (kingCanCastle(board, kingRow, kingColumn, newRow, newColumn, kingColor))
+        return true;
+
     if (std::abs(newRow - kingRow) > 1 || std::abs(newColumn - kingColumn) > 1)
         return false;
 

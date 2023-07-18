@@ -1,6 +1,7 @@
 #include "Board.h"
 
 #include "Colors.h"
+#include "KingCastleLogic.h"
 #include "KingCheckLogic.h"
 #include "KingMateLogic.h"
 #include "MoveValidator.h"
@@ -101,14 +102,21 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
             MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) &&
             !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
     {
-        // remove piece from old tile
+        auto [oldRow, oldColumn]{ piece->getBoardPosition() };
+
         tile.removePiece();
-        // remove piece from new tile (in case of capturing)
         m_board[newRow][newColumn].removePiece();
         placePieceAtChosenTile(newRow, newColumn, piece);
+        if (piece->getType() == PieceType::king && std::abs(oldColumn - newColumn) == 2)
+            moveRookForCastling(m_board, newRow, newColumn);
+
         pieceSelected = false;
 
-        // change the color, then check for checkmate
+        Piece& pieceReference{ m_board[newRow][newColumn].getPiece().value() };
+        pieceReference.setHasMoved();
+        if (piece->getType() == PieceType::pawn && std::abs(newRow - oldRow) == 2)
+            pieceReference.setPawnMovedTwoSquares();
+
         changeCurrentMoveColor(currentColorToMove);
         if (isKingCheckmated(m_board, currentColorToMove))
         {

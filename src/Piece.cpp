@@ -36,6 +36,16 @@ void Piece::setBoardPosition(std::pair<int, int> position)
     m_rectangle.y = position.first * 100;
 }
 
+void Piece::setPawnMovedTwoSquares()
+{
+    m_hasMovedTwoSquares = true;
+}
+
+void Piece::setHasMoved()
+{
+    m_hasMoved = true;
+}
+
 PieceType Piece::getType() const
 {
     return m_type;
@@ -69,4 +79,14 @@ void Piece::deselect()
 bool Piece::isSelected() const
 {
     return m_isSelected;
+}
+
+bool Piece::canBeTakenEnPassant() const
+{
+    return m_hasMovedTwoSquares && m_type == PieceType::pawn;
+}
+
+bool Piece::hasMoved() const
+{
+    return m_hasMoved;
 }
