@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "KingCastleLogic.h"
 #include "KingCheckLogic.h"
+#include "PawnMovementLogic.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -45,80 +46,10 @@ bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
 bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
         int pawnRow, int pawnColumn, int newRow, int newColumn, PieceColor color)
 {
-    // checkForEnPassant();
-    // todo: make a less lazy version of separating pawn move validation by color
-    // also todo: fix moving backwards lol
     if (color == PieceColor::white)
-    {
-        auto piece{ board[newRow][newColumn].getPiece() };
-        if (piece && piece->getColor() == PieceColor::black)
-        {
-            // can't attack forward
-            if (pawnColumn == newColumn)
-                return false;
-
-            // a capture
-            if (pawnRow - newRow == 1 && (pawnColumn - newColumn == 1 ||
-                    pawnColumn - newColumn == -1))
-                return true;
-
-            return false;
-        }
-        // new tile doesn't have a piece or the piece is white
-        else
-        {
-            if (pawnColumn != newColumn)
-                return false;
-
-            if (newRow > pawnRow)
-                return false;
-            if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow <= 2 &&
-                    !board[pawnRow - 1][pawnColumn].getPiece())
-                return true;
-            if (pawnRow == constants::whitePawnStartRow && pawnRow - newRow > 2)
-                return false;
-            if (pawnRow != constants::whitePawnStartRow && pawnRow - newRow == 1)
-                return true;
-
-            return false;
-        }
-    }
-    // black pawn
+        return whitePawnMoveIsValid(board, pawnRow, pawnColumn, newRow, newColumn);
     else
-    {
-        auto piece{ board[newRow][newColumn].getPiece() };
-        if (piece && piece->getColor() == PieceColor::white)
-        {
-            // can't attack forward
-            if (pawnColumn == newColumn)
-                return false;
-
-            // a capture
-            if (newRow - pawnRow == 1 && (pawnColumn - newColumn == 1 ||
-                    pawnColumn - newColumn == -1))
-                return true;
-
-            return false;
-        }
-        // new tile doesn't have a piece or the piece is black
-        else
-        {
-            if (pawnColumn != newColumn)
-                return false;
-
-            if (newRow < pawnRow)
-                return false;
-            if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow <= 2 &&
-                    !board[pawnRow + 1][pawnColumn].getPiece())
-                return true;
-            if (pawnRow == constants::blackPawnStartRow && newRow - pawnRow > 2)
-                return false;
-            if (pawnRow != constants::blackPawnStartRow && newRow - pawnRow == 1)
-                return true;
-
-            return false;
-        }
-    }
+        return blackPawnMoveIsValid(board, pawnRow, pawnColumn, newRow, newColumn);
 }
 
 bool MoveValidator::knightMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
