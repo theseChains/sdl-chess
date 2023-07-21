@@ -24,14 +24,12 @@ public:
 
     void setPosition(std::pair<int, int> position);
     void setBoardPosition(std::pair<int, int> position);
-    void setPawnMovedTwoSquares();
     void setHasMoved();
 
     void select();
     void deselect();
     bool isSelected() const;
 
-    bool canBeTakenEnPassant() const;
     bool hasMoved() const;
 
 private:
@@ -42,7 +40,6 @@ private:
     std::pair<int, int> m_position{};
     bool m_isSelected{ false };
 
-    bool m_hasMovedTwoSquares{ false };
     bool m_hasMoved{ false };
 };
 
