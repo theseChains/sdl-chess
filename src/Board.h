@@ -1,6 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "Move.h"
 #include "Renderer.h"
 #include "TextureTable.h"
 #include "Tile.h"
@@ -24,7 +25,8 @@ public:
     std::array<std::array<Tile, 8>, 8>& getTiles();
 
 private:
-    std::array<std::array<Tile, 8>, 8> m_board;
+    std::array<std::array<Tile, 8>, 8> m_board{};
+    Move m_lastMove{};
 
     void initializeTile(TextureTable& table, int i, int j);
     void placePieceAtChosenTile(int newRow, int newColumn, const std::optional<Piece>& piece);

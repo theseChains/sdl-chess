@@ -5,11 +5,13 @@
 #include "KingCheckLogic.h"
 #include "KingMateLogic.h"
 #include "MoveValidator.h"
+#include "PawnMovementLogic.h"
 #include "PieceArrangement.h"
 
 #include <iostream>
 
 Board::Board(TextureTable& table)
+    : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none }
 {
     for (int i{ 0 }; i < 8; ++i)
         for (int j{ 0 }; j < 8; ++j)
@@ -99,10 +101,12 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
     auto piece{ tile.getPiece() };
 
     if (piece && piece->isSelected() &&
-            MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) &&
-            !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
+        (MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) ||
+         canTakeEnPassant(m_board, piece.value(), newRow, newColumn, m_lastMove)) &&
+        !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
     {
         auto [oldRow, oldColumn]{ piece->getBoardPosition() };
+        m_lastMove = { { oldRow, oldColumn }, { newRow, newColumn }, piece->getType() };
 
         tile.removePiece();
         m_board[newRow][newColumn].removePiece();
@@ -114,8 +118,6 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
 
         Piece& pieceReference{ m_board[newRow][newColumn].getPiece().value() };
         pieceReference.setHasMoved();
-        if (piece->getType() == PieceType::pawn && std::abs(newRow - oldRow) == 2)
-            pieceReference.setPawnMovedTwoSquares();
 
         changeCurrentMoveColor(currentColorToMove);
         if (isKingCheckmated(m_board, currentColorToMove))
