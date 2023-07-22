@@ -13,9 +13,9 @@
 class Board
 {
 public:
-    Board(TextureTable& table);
+    Board(TextureTable& table, Renderer& renderer);
 
-    void draw(Renderer& renderer);
+    void draw();
 
     void checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
             PieceColor curentColorToMove);
@@ -27,6 +27,8 @@ public:
 private:
     std::array<std::array<Tile, 8>, 8> m_board{};
     Move m_lastMove{};
+    TextureTable& m_textureTable;
+    Renderer& m_renderer;
 
     void initializeTile(TextureTable& table, int i, int j);
     void placePieceAtChosenTile(int newRow, int newColumn, const std::optional<Piece>& piece);

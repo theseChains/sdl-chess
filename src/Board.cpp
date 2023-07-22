@@ -7,25 +7,28 @@
 #include "MoveValidator.h"
 #include "PawnMovementLogic.h"
 #include "PieceArrangement.h"
+#include "PromotionLogic.h"
 
 #include <iostream>
 
-Board::Board(TextureTable& table)
+Board::Board(TextureTable& table, Renderer& renderer)
     : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none }
+    , m_textureTable{ table }
+    , m_renderer{ renderer }
 {
     for (int i{ 0 }; i < 8; ++i)
         for (int j{ 0 }; j < 8; ++j)
-            initializeTile(table, i, j);
+            initializeTile(m_textureTable, i, j);
 }
 
-void Board::draw(Renderer& renderer)
+void Board::draw()
 {
     for (int i{ 0 }; i < 8; ++i)
     {
         for (int j{ 0 }; j < 8; ++j)
         {
-            renderer.setDrawColor(m_board[i][j].getConvertedColor());
-            renderer.fillAndDrawRect(m_board[i][j].getRectangle());
+            m_renderer.setDrawColor(m_board[i][j].getConvertedColor());
+            m_renderer.fillAndDrawRect(m_board[i][j].getRectangle());
         }
     }
 
@@ -36,7 +39,7 @@ void Board::draw(Renderer& renderer)
         {
             auto piece{ m_board[i][j].getPiece() };
             if (piece)
-                piece.value().draw(renderer);
+                piece.value().draw(m_renderer);
         }
     }
 }
@@ -113,6 +116,9 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
         placePieceAtChosenTile(newRow, newColumn, piece);
         if (piece->getType() == PieceType::king && std::abs(oldColumn - newColumn) == 2)
             moveRookForCastling(m_board, newRow, newColumn);
+
+        if (piece->getType() == PieceType::pawn)
+            checkForPromotion(m_board, newRow, newColumn);
 
         pieceSelected = false;
 

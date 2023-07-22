@@ -7,7 +7,7 @@ Application::Application()
     : m_window{ constants::windowWidth, constants::windowHeight }
     , m_renderer{ m_window.getWindow(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE }
     , m_textures{ m_renderer }
-    , m_board{ m_textures }
+    , m_board{ m_textures, m_renderer }
     , m_userInput{}
 {
 }
@@ -40,6 +40,6 @@ void Application::processInput(bool& keepRunning)
 void Application::draw()
 {
     m_renderer.clear();
-    m_board.draw(m_renderer);
+    m_board.draw();
     m_renderer.present();
 }
