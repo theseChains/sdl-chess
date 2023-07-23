@@ -1,13 +1,14 @@
 #include "Board.h"
 
 #include "Colors.h"
+#include "Constants.h"
 #include "KingCastleLogic.h"
 #include "KingCheckLogic.h"
 #include "KingMateLogic.h"
 #include "MoveValidator.h"
 #include "PawnMovementLogic.h"
 #include "PieceArrangement.h"
-#include "PromotionLogic.h"
+#include "PromotionOperations.h"
 
 #include <iostream>
 
@@ -42,6 +43,9 @@ void Board::draw()
                 piece.value().draw(m_renderer);
         }
     }
+
+    if (m_promotingPawn)
+        drawPromotionPieces(m_board, m_textureTable, m_renderer, m_lastMove);
 }
 
 void changeCurrentMoveColor(PieceColor& color)
@@ -76,6 +80,20 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
     }
 }
 
+void Board::checkForPromotionPieceSelection(SDL_Point mousePosition)
+{
+    auto [boardRow, boardColumn]{ getBoardPositionFromMouse(mousePosition) };
+    auto [pawnRow, pawnColumn]{ m_lastMove.to };
+    if (boardColumn != pawnColumn || std::abs(boardRow - pawnRow) > 3)
+        return;
+
+    auto pawnTile{ findTile({ pawnRow * 100, pawnColumn * 100 }) };
+    handlePromotedPieceSelection(pawnTile->get(), m_textureTable, boardRow,
+            pawnRow, pawnColumn);
+
+    m_promotingPawn = false;
+}
+
 std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> position)
 {
     for (auto& row : m_board)
@@ -92,6 +110,8 @@ std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> 
 
 void Board::placePieceAtChosenTile(int newRow, int newColumn, const std::optional<Piece>& piece)
 {
+    // todo: add exceptions here? might have bad optional access here
+    // and wherever this funciton is called
     auto chosenTile{ findTile({ newRow * 100, newColumn * 100 }) };
     chosenTile->get().placePiece(piece.value());
     chosenTile->get().getPiece()->setBoardPosition({ newRow, newColumn });
@@ -117,8 +137,9 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
         if (piece->getType() == PieceType::king && std::abs(oldColumn - newColumn) == 2)
             moveRookForCastling(m_board, newRow, newColumn);
 
-        if (piece->getType() == PieceType::pawn)
-            checkForPromotion(m_board, newRow, newColumn);
+        if (piece->getType() == PieceType::pawn &&
+            pawnIsPromoting(m_board, newRow, newColumn))
+            m_promotingPawn = true;
 
         pieceSelected = false;
 
@@ -170,6 +191,11 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
 std::array<std::array<Tile, 8>, 8>& Board::getTiles()
 {
     return m_board;
+}
+
+bool Board::promotingPawn() const
+{
+    return m_promotingPawn;
 }
 
 void Board::initializeTile(TextureTable& table, int i, int j)

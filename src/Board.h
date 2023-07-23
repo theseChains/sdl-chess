@@ -19,16 +19,21 @@ public:
 
     void checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
             PieceColor curentColorToMove);
+    void checkForPromotionPieceSelection(SDL_Point mousePosition);
     void checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
             PieceColor& curentColorToMove);
     std::optional<std::reference_wrapper<Tile>> findTile(std::pair<int, int> position);
+
     std::array<std::array<Tile, 8>, 8>& getTiles();
+    bool promotingPawn() const;
 
 private:
     std::array<std::array<Tile, 8>, 8> m_board{};
     Move m_lastMove{};
     TextureTable& m_textureTable;
     Renderer& m_renderer;
+
+    bool m_promotingPawn{ false };
 
     void initializeTile(TextureTable& table, int i, int j);
     void placePieceAtChosenTile(int newRow, int newColumn, const std::optional<Piece>& piece);

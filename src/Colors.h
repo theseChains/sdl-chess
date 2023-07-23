@@ -6,7 +6,7 @@
 enum class TileColor
 {
     light,
-    dark
+    dark,
 };
 
 enum class PieceColor
