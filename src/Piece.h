@@ -32,6 +32,8 @@ public:
 
     bool hasMoved() const;
 
+    bool operator==(const Piece& other) const;
+
 private:
     PieceType m_type{};
     PieceColor m_color{};

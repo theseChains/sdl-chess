@@ -52,3 +52,14 @@ void Tile::placePiece(const Piece& piece)
 {
     m_piece = piece;
 }
+
+bool Tile::operator==(const Tile& other) const
+{
+    if (getPiece() && other.getPiece())
+        return (m_piece.value() == other.m_piece.value() &&
+                m_position == other.m_position);
+    else if (!getPiece() && !other.getPiece())
+        return (m_position == other.m_position);
+
+    return false;
+}

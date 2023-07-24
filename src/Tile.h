@@ -13,7 +13,7 @@
 class Tile
 {
 public:
-    // this one doesn't quite make sense, gotta find a way around
+    // todo: remove this
     Tile() = default;
     Tile(TileColor color, const std::optional<Piece>& piece, std::pair<int, int> position);
 
@@ -26,6 +26,8 @@ public:
 
     void removePiece();
     void placePiece(const Piece& piece);
+
+    bool operator==(const Tile& other) const;
 
 private:
     SDL_Rect m_rectangle{};

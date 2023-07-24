@@ -10,12 +10,14 @@
 #include "PieceArrangement.h"
 #include "PromotionOperations.h"
 
+#include <algorithm>
 #include <iostream>
 
 Board::Board(TextureTable& table, Renderer& renderer)
     : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none }
     , m_textureTable{ table }
     , m_renderer{ renderer }
+    , m_positions{}
 {
     for (int i{ 0 }; i < 8; ++i)
         for (int j{ 0 }; j < 8; ++j)
@@ -147,6 +149,7 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
         pieceReference.setHasMoved();
 
         changeCurrentMoveColor(currentColorToMove);
+        // change this stuff to checkForGameEnd() or something
         if (isKingCheckmated(m_board, currentColorToMove))
         {
             if (currentColorToMove == PieceColor::white)
@@ -157,6 +160,19 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
             currentColorToMove = PieceColor::noColor;
         }
 
+        if (!isKingInCheck(m_board, currentColorToMove) &&
+            !playerHasLegalMoves(m_board, currentColorToMove))
+        {
+            std::cout << "draw by stalemate\n";
+            currentColorToMove = PieceColor::noColor;
+        }
+
+        m_positions.push_back(m_board);
+        if (std::count(m_positions.begin(), m_positions.end(), m_board) >= 3)
+        {
+            std::cout << "draw by three-fold repetition\n";
+            currentColorToMove = PieceColor::noColor;
+        }
         keepGoing = false;
     }
     else if (piece && piece->isSelected())

@@ -9,6 +9,7 @@
 #include <array>
 #include <functional>
 #include <optional>
+#include <vector>
 
 class Board
 {
@@ -32,6 +33,7 @@ private:
     Move m_lastMove{};
     TextureTable& m_textureTable;
     Renderer& m_renderer;
+    std::vector<std::array<std::array<Tile, 8>, 8>> m_positions{};
 
     bool m_promotingPawn{ false };
 

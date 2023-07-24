@@ -80,3 +80,9 @@ bool Piece::hasMoved() const
 {
     return m_hasMoved;
 }
+
+bool Piece::operator==(const Piece& other) const
+{
+    return (m_type == other.m_type && m_color == other.m_color &&
+            m_position == other.m_position);
+}
