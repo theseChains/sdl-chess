@@ -4,7 +4,7 @@
 
 std::pair<int, int> getBoardPositionFromMouse(SDL_Point mousePosition)
 {
-    return { convertToBoardPosition({ mousePosition.y, mousePosition.x }) };
+    return convertToBoardPosition({ mousePosition.y, mousePosition.x });
 }
 
 std::pair<int, int> convertToBoardPosition(std::pair<int, int> position)
