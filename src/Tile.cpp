@@ -2,12 +2,13 @@
 
 #include "Constants.h"
 
-Tile::Tile(TileColor color, const std::optional<Piece>& piece, std::pair<int, int> position)
+Tile::Tile(TileColor color, const std::optional<Piece>& piece,
+           std::pair<int, int> position)
     : m_color{ color }, m_piece{ piece }, m_position{ position }
 {
     // switch the x and y for rectangle position
-    m_rectangle = { position.second, position.first, constants::windowWidth / constants::boardSize,
-        constants::windowHeight / constants::boardSize };
+    m_rectangle = { position.second, position.first, constants::tileWidth,
+                    constants::tileHeight };
 }
 
 const SDL_Rect& Tile::getRectangle() const
@@ -23,9 +24,9 @@ SDL_Rect& Tile::getRectangle()
 DrawColor Tile::getConvertedColor() const
 {
     if (m_color == TileColor::light)
-        return { 230, 230, 230, 255 };
+        return colors::lightTile;
 
-    return { 150, 75, 0, 255 };
+    return colors::darkTile;
 }
 
 const std::optional<Piece>& Tile::getPiece() const

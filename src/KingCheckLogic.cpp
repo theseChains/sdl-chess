@@ -1,19 +1,22 @@
 #include "KingCheckLogic.h"
 
-#include "MoveValidator.h"
-
 #include <iostream>
 #include <optional>
 
-std::optional<std::pair<int, int>> findKingPosition(const std::array<std::array<Tile, 8>, 8>& board,
-        PieceColor kingColor)
+#include "MoveValidator.h"
+
+std::optional<std::pair<int, int>> findKingPosition(const TileBoard& board,
+                                                    PieceColor kingColor)
 {
+    // todo: optional isnt really required here
+    // better off using a variable to hold the position and then return it?
     for (const auto& row : board)
     {
         for (const auto& tile : row)
         {
             auto piece{ tile.getPiece() };
-            if (piece && piece->getType() == PieceType::king && piece->getColor() == kingColor)
+            if (piece && piece->getType() == PieceType::king &&
+                piece->getColor() == kingColor)
                 return { piece->getBoardPosition() };
         }
     }
@@ -21,7 +24,7 @@ std::optional<std::pair<int, int>> findKingPosition(const std::array<std::array<
     return std::nullopt;
 }
 
-bool isKingInCheck(const std::array<std::array<Tile, 8>, 8>& board, PieceColor kingColor)
+bool isKingInCheck(const TileBoard& board, PieceColor kingColor)
 {
     auto [kingRow, kingColumn]{ findKingPosition(board, kingColor).value() };
     for (const auto& row : board)
@@ -31,7 +34,8 @@ bool isKingInCheck(const std::array<std::array<Tile, 8>, 8>& board, PieceColor k
             auto piece{ tile.getPiece() };
             // piece of different color can capture king
             if (piece && piece->getColor() != kingColor &&
-                    MoveValidator::moveIsValid(board, piece.value(), kingRow, kingColumn))
+                MoveValidator::moveIsValid(board, piece.value(), kingRow,
+                                           kingColumn))
                 return true;
         }
     }
@@ -39,8 +43,8 @@ bool isKingInCheck(const std::array<std::array<Tile, 8>, 8>& board, PieceColor k
     return false;
 }
 
-bool kingWillBeInCheck(std::array<std::array<Tile, 8>, 8> board, const Piece& piece,
-        int newRow, int newColumn)
+bool kingWillBeInCheck(TileBoard board, const Piece& piece, int newRow,
+                       int newColumn)
 {
     auto [pieceRow, pieceColumn]{ piece.getBoardPosition() };
 
@@ -50,7 +54,8 @@ bool kingWillBeInCheck(std::array<std::array<Tile, 8>, 8> board, const Piece& pi
     board[newRow][newColumn].removePiece();
     board[newRow][newColumn].placePiece(piece);
     // set the new position for the piece
-    board[newRow][newColumn].getPiece()->setBoardPosition({ newRow, newColumn });
+    board[newRow][newColumn].getPiece()->setPositionFromBoardPosition(
+        { newRow, newColumn });
 
     PieceColor color{ piece.getColor() };
     return isKingInCheck(board, color);

@@ -1,40 +1,50 @@
 #ifndef PIECE_ARRANGEMENT_H
 #define PIECE_ARRANGEMENT_H
 
-#include "Colors.h"
-#include "PieceType.h"
-
 #include <array>
+
+#include "Aliases.h"
+#include "Colors.h"
+#include "Constants.h"
+#include "PieceType.h"
 
 namespace config
 {
-    using enum PieceType;
-    using enum PieceColor;
+    static constexpr ColorAndType bRook{ PieceColor::black, PieceType::rook };
+    static constexpr ColorAndType bKnight{ PieceColor::black,
+                                           PieceType::knight };
+    static constexpr ColorAndType bBishop{ PieceColor::black,
+                                           PieceType::bishop };
+    static constexpr ColorAndType bQueen{ PieceColor::black, PieceType::queen };
+    static constexpr ColorAndType bKing{ PieceColor::black, PieceType::king };
+    static constexpr ColorAndType bPawn{ PieceColor::black, PieceType::pawn };
+    static constexpr ColorAndType wRook{ PieceColor::white, PieceType::rook };
+    static constexpr ColorAndType wKnight{ PieceColor::white,
+                                           PieceType::knight };
+    static constexpr ColorAndType wBishop{ PieceColor::white,
+                                           PieceType::bishop };
+    static constexpr ColorAndType wQueen{ PieceColor::white, PieceType::queen };
+    static constexpr ColorAndType wKing{ PieceColor::white, PieceType::king };
+    static constexpr ColorAndType wPawn{ PieceColor::white, PieceType::pawn };
+    static constexpr ColorAndType noPiece{ PieceColor::noColor,
+                                           PieceType::none };
 
-    static constexpr std::pair<PieceColor, PieceType> bRook{ black, rook };
-    static constexpr std::pair<PieceColor, PieceType> bKnight{ black, knight };
-    static constexpr std::pair<PieceColor, PieceType> bBishop{ black, bishop };
-    static constexpr std::pair<PieceColor, PieceType> bQueen{ black, queen };
-    static constexpr std::pair<PieceColor, PieceType> bKing{ black, king };
-    static constexpr std::pair<PieceColor, PieceType> bPawn{ black, pawn };
-    static constexpr std::pair<PieceColor, PieceType> wRook{ white, rook };
-    static constexpr std::pair<PieceColor, PieceType> wKnight{ white, knight };
-    static constexpr std::pair<PieceColor, PieceType> wBishop{ white, bishop };
-    static constexpr std::pair<PieceColor, PieceType> wQueen{ white, queen };
-    static constexpr std::pair<PieceColor, PieceType> wKing{ white, king };
-    static constexpr std::pair<PieceColor, PieceType> wPawn{ white, pawn };
-    static constexpr std::pair<PieceColor, PieceType> noPiece{ noColor, none };
-
-    inline constexpr std::array<std::array<std::pair<PieceColor, PieceType>, 8>, 8> arrangement{ {
-        { { bRook, bKnight, bBishop, bQueen, bKing, bBishop, bKnight, bRook } },
-        { { bPawn, bPawn, bPawn, bPawn, bPawn, bPawn, bPawn, bPawn} },
-        { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece} },
-        { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece} },
-        { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece} },
-        { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece} },
-        { { wPawn, wPawn, wPawn, wPawn, wPawn, wPawn, wPawn, wPawn} },
-        { { wRook, wKnight, wBishop, wQueen, wKing, wBishop, wKnight, wRook } }
-    } };
+    inline constexpr PieceArrangement arrangement{
+        { { { bRook, bKnight, bBishop, bQueen, bKing, bBishop, bKnight,
+              bRook } },
+          { { bPawn, bPawn, bPawn, bPawn, bPawn, bPawn, bPawn, bPawn } },
+          { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece,
+              noPiece } },
+          { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece,
+              noPiece } },
+          { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece,
+              noPiece } },
+          { { noPiece, noPiece, noPiece, noPiece, noPiece, noPiece, noPiece,
+              noPiece } },
+          { { wPawn, wPawn, wPawn, wPawn, wPawn, wPawn, wPawn, wPawn } },
+          { { wRook, wKnight, wBishop, wQueen, wKing, wBishop, wKnight,
+              wRook } } }
+    };
 }
 
 #endif

@@ -15,15 +15,16 @@ void Renderer::present()
     SDL_RenderPresent(m_renderer);
 }
 
-void Renderer::setDrawColor(unsigned char red, unsigned char green, unsigned char blue,
-        unsigned char alpha)
+void Renderer::setDrawColor(unsigned char red, unsigned char green,
+                            unsigned char blue, unsigned char alpha)
 {
     SDL_SetRenderDrawColor(m_renderer, red, green, blue, alpha);
 }
 
 void Renderer::setDrawColor(const DrawColor& color)
 {
-    SDL_SetRenderDrawColor(m_renderer, color.red, color.green, color.blue, color.alpha);
+    SDL_SetRenderDrawColor(m_renderer, color.red, color.green, color.blue,
+                           color.alpha);
 }
 
 void Renderer::fillRect(const SDL_Rect& rectangle)
@@ -48,7 +49,7 @@ SDL_Texture* Renderer::loadTexture(const std::string& path)
 }
 
 void Renderer::copyTexture(SDL_Texture* texture, const SDL_Rect* source,
-        const SDL_Rect* destination)
+                           const SDL_Rect* destination)
 {
     SDL_RenderCopy(m_renderer, texture, source, destination);
 }

@@ -1,15 +1,15 @@
 #include "MoveValidator.h"
 
+#include <iostream>
+#include <stdexcept>
+
 #include "Constants.h"
 #include "KingCastleLogic.h"
 #include "KingCheckLogic.h"
 #include "PawnMovementLogic.h"
 
-#include <stdexcept>
-#include <iostream>
-
-bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-        const Piece& piece, int newRow, int newColumn)
+bool MoveValidator::moveIsValid(const TileBoard& board, const Piece& piece,
+                                int newRow, int newColumn)
 {
     auto [pieceRow, pieceColumn]{ piece.getBoardPosition() };
     PieceColor color{ piece.getColor() };
@@ -18,45 +18,60 @@ bool MoveValidator::moveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
     switch (type)
     {
         case PieceType::pawn:
-            return pawnMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn, color);
+            return pawnMoveIsValid(board, pieceRow, pieceColumn, newRow,
+                                   newColumn, color);
 
         case PieceType::knight:
-            return knightMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn, color);
+            return knightMoveIsValid(board, pieceRow, pieceColumn, newRow,
+                                     newColumn, color);
 
         case PieceType::bishop:
-            return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn, color);
+            return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow,
+                                     newColumn, color);
 
         case PieceType::rook:
-            return rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn, color);
+            return rookMoveIsValid(board, pieceRow, pieceColumn, newRow,
+                                   newColumn, color);
 
         case PieceType::queen:
-            return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn, color) ||
-                rookMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn, color);
+            return bishopMoveIsValid(board, pieceRow, pieceColumn, newRow,
+                                     newColumn, color) ||
+                   rookMoveIsValid(board, pieceRow, pieceColumn, newRow,
+                                   newColumn, color);
 
         case PieceType::king:
-            return kingMoveIsValid(board, pieceRow, pieceColumn, newRow, newColumn, color);
+            return kingMoveIsValid(board, pieceRow, pieceColumn, newRow,
+                                   newColumn, color);
 
         case PieceType::none:
-            throw std::runtime_error{ "moveIsValid(): piece type none should not be checked" };
+            throw std::runtime_error{
+                "moveIsValid(): piece type none should not be checked"
+            };
     }
 
     return true;
 }
 
-bool MoveValidator::pawnMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-        int pawnRow, int pawnColumn, int newRow, int newColumn, PieceColor color)
+bool MoveValidator::pawnMoveIsValid(const TileBoard& board, int pawnRow,
+                                    int pawnColumn, int newRow, int newColumn,
+                                    PieceColor color)
 {
     if (color == PieceColor::white)
-        return whitePawnMoveIsValid(board, pawnRow, pawnColumn, newRow, newColumn);
+        return whitePawnMoveIsValid(board, pawnRow, pawnColumn, newRow,
+                                    newColumn);
     else
-        return blackPawnMoveIsValid(board, pawnRow, pawnColumn, newRow, newColumn);
+        return blackPawnMoveIsValid(board, pawnRow, pawnColumn, newRow,
+                                    newColumn);
 }
 
-bool MoveValidator::knightMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-        int knightRow, int knightColumn, int newRow, int newColumn, PieceColor knightColor)
+bool MoveValidator::knightMoveIsValid(const TileBoard& board, int knightRow,
+                                      int knightColumn, int newRow,
+                                      int newColumn, PieceColor knightColor)
 {
-    if (!((std::abs(newRow - knightRow) == 2 && std::abs(newColumn - knightColumn) == 1) ||
-        (std::abs(newRow - knightRow) == 1 && std::abs(newColumn - knightColumn) == 2)))
+    if (!((std::abs(newRow - knightRow) == 2 &&
+           std::abs(newColumn - knightColumn) == 1) ||
+          (std::abs(newRow - knightRow) == 1 &&
+           std::abs(newColumn - knightColumn) == 2)))
         return false;
 
     auto piece{ board[newRow][newColumn].getPiece() };
@@ -67,22 +82,24 @@ bool MoveValidator::knightMoveIsValid(const std::array<std::array<Tile, 8>, 8>& 
     return true;
 }
 
-std::pair<int, int> getBishopDirection(int bishopRow, int bishopColumn, int newRow, int newColumn)
+std::pair<int, int> getBishopDirection(int bishopRow, int bishopColumn,
+                                       int newRow, int newColumn)
 {
     int rowDirection{ bishopRow < newRow ? 1 : -1 };
     int columnDirection{ bishopColumn < newColumn ? 1 : -1 };
     return { rowDirection, columnDirection };
 }
 
-bool bishopJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
-        int bishopRow, int bishopColumn, int newRow, int newColumn)
+bool bishopJumpsOverPiece(const TileBoard& board, int bishopRow,
+                          int bishopColumn, int newRow, int newColumn)
 {
-    auto [rowDirection, columnDirection]{
-        getBishopDirection(bishopRow, bishopColumn, newRow, newColumn) };
+    auto [rowDirection, columnDirection]{ getBishopDirection(
+        bishopRow, bishopColumn, newRow, newColumn) };
 
     while (bishopRow + rowDirection != newRow)
     {
-        if (board[bishopRow + rowDirection][bishopColumn + columnDirection].getPiece())
+        if (board[bishopRow + rowDirection][bishopColumn + columnDirection]
+                .getPiece())
             return true;
 
         bishopRow += rowDirection;
@@ -92,8 +109,9 @@ bool bishopJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
     return false;
 }
 
-bool MoveValidator::bishopMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-        int bishopRow, int bishopColumn, int newRow, int newColumn, PieceColor bishopColor)
+bool MoveValidator::bishopMoveIsValid(const TileBoard& board, int bishopRow,
+                                      int bishopColumn, int newRow,
+                                      int newColumn, PieceColor bishopColor)
 {
     if (std::abs(newRow - bishopRow) != std::abs(newColumn - bishopColumn))
         return false;
@@ -109,7 +127,8 @@ bool MoveValidator::bishopMoveIsValid(const std::array<std::array<Tile, 8>, 8>& 
     return true;
 }
 
-std::pair<int, int> getRookDirection(int rookRow, int rookColumn, int newRow, int newColumn)
+std::pair<int, int> getRookDirection(int rookRow, int rookColumn, int newRow,
+                                     int newColumn)
 {
     if (rookRow != newRow)
     {
@@ -123,11 +142,11 @@ std::pair<int, int> getRookDirection(int rookRow, int rookColumn, int newRow, in
     }
 }
 
-bool rookJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
-        int rookRow, int rookColumn, int newRow, int newColumn)
+bool rookJumpsOverPiece(const TileBoard& board, int rookRow, int rookColumn,
+                        int newRow, int newColumn)
 {
-    auto [rowDirection, columnDirection]{
-        getRookDirection(rookRow, rookColumn, newRow, newColumn) };
+    auto [rowDirection, columnDirection]{ getRookDirection(rookRow, rookColumn,
+                                                           newRow, newColumn) };
 
     if (rowDirection != 0)
     {
@@ -153,8 +172,9 @@ bool rookJumpsOverPiece(const std::array<std::array<Tile, 8>, 8>& board,
     return false;
 }
 
-bool MoveValidator::rookMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-        int rookRow, int rookColumn, int newRow, int newColumn, PieceColor rookColor)
+bool MoveValidator::rookMoveIsValid(const TileBoard& board, int rookRow,
+                                    int rookColumn, int newRow, int newColumn,
+                                    PieceColor rookColor)
 {
     if (newRow - rookRow != 0 && newColumn - rookColumn != 0)
         return false;
@@ -170,8 +190,9 @@ bool MoveValidator::rookMoveIsValid(const std::array<std::array<Tile, 8>, 8>& bo
     return true;
 }
 
-bool MoveValidator::kingMoveIsValid(const std::array<std::array<Tile, 8>, 8>& board,
-        int kingRow, int kingColumn, int newRow, int newColumn, PieceColor kingColor)
+bool MoveValidator::kingMoveIsValid(const TileBoard& board, int kingRow,
+                                    int kingColumn, int newRow, int newColumn,
+                                    PieceColor kingColor)
 {
     if (kingCanCastle(board, kingRow, kingColumn, newRow, newColumn, kingColor))
         return true;

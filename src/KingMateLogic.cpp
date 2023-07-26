@@ -1,10 +1,11 @@
 #include "KingMateLogic.h"
-#include "MoveValidator.h"
 
 #include <iostream>
 
-bool kingHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Piece& king,
-        int currentRow, int currentColumn)
+#include "MoveValidator.h"
+
+bool kingHasLegalMoves(const TileBoard& board, const Piece& king,
+                       int currentRow, int currentColumn)
 {
     for (int rowOffset{ -1 }; rowOffset < 2; ++rowOffset)
     {
@@ -20,7 +21,7 @@ bool kingHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Pi
                 continue;
 
             if (MoveValidator::moveIsValid(board, king, newRow, newColumn) &&
-                    !kingWillBeInCheck(board, king, newRow, newColumn))
+                !kingWillBeInCheck(board, king, newRow, newColumn))
                 return true;
         }
     }
@@ -28,8 +29,8 @@ bool kingHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Pi
     return false;
 }
 
-bool pawnHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Piece& pawn,
-        int currentRow, int currentColumn)
+bool pawnHasLegalMoves(const TileBoard& board, const Piece& pawn,
+                       int currentRow, int currentColumn)
 {
     for (int columnOffset{ -1 }; columnOffset <= 1; ++columnOffset)
     {
@@ -44,15 +45,15 @@ bool pawnHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Pi
             continue;
 
         if (MoveValidator::moveIsValid(board, pawn, newRow, newColumn) &&
-                !kingWillBeInCheck(board, pawn, newRow, newColumn))
+            !kingWillBeInCheck(board, pawn, newRow, newColumn))
             return true;
     }
 
     return false;
 }
 
-bool knightHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Piece& knight,
-        int currentRow, int currentColumn)
+bool knightHasLegalMoves(const TileBoard& board, const Piece& knight,
+                         int currentRow, int currentColumn)
 {
     std::array<int, 8> rowOffsets{ -2, -2, -1, -1, 1, 1, 2, 2 };
     std::array<int, 8> columnOffsets{ 1, -1, 2, -2, 2, -2, 1, -1 };
@@ -65,15 +66,15 @@ bool knightHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const 
             continue;
 
         if (MoveValidator::moveIsValid(board, knight, newRow, newColumn) &&
-                !kingWillBeInCheck(board, knight, newRow, newColumn))
+            !kingWillBeInCheck(board, knight, newRow, newColumn))
             return true;
     }
 
     return false;
 }
 
-bool bishopHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Piece& bishop,
-        int currentRow, int currentColumn)
+bool bishopHasLegalMoves(const TileBoard& board, const Piece& bishop,
+                         int currentRow, int currentColumn)
 {
     std::array<int, 4> rowDirections{ 1, 1, -1, -1 };
     std::array<int, 4> columnDirections{ 1, -1, 1, -1 };
@@ -86,7 +87,7 @@ bool bishopHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const 
         while (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8)
         {
             if (MoveValidator::moveIsValid(board, bishop, newRow, newColumn) &&
-                    !kingWillBeInCheck(board, bishop, newRow, newColumn))
+                !kingWillBeInCheck(board, bishop, newRow, newColumn))
                 return true;
 
             newRow += rowDirections[i];
@@ -97,8 +98,8 @@ bool bishopHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const 
     return false;
 }
 
-bool rookHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Piece& rook,
-        int currentRow, int currentColumn)
+bool rookHasLegalMoves(const TileBoard& board, const Piece& rook,
+                       int currentRow, int currentColumn)
 {
     std::array<int, 4> rowDirections{ 1, -1, 0, 0 };
     std::array<int, 4> columnDirections{ 0, 0, 1, -1 };
@@ -111,7 +112,7 @@ bool rookHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Pi
         while (newRow >= 0 && newRow < 8 && newColumn >= 0 && newColumn < 8)
         {
             if (MoveValidator::moveIsValid(board, rook, newRow, newColumn) &&
-                    !kingWillBeInCheck(board, rook, newRow, newColumn))
+                !kingWillBeInCheck(board, rook, newRow, newColumn))
                 return true;
 
             newRow += rowDirections[i];
@@ -122,7 +123,7 @@ bool rookHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Pi
     return false;
 }
 
-bool playerHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, PieceColor color)
+bool playerHasLegalMoves(const TileBoard& board, PieceColor color)
 {
     for (const auto& row : board)
     {
@@ -130,24 +131,36 @@ bool playerHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, PieceC
         {
             auto piece{ tile.getPiece() };
             auto [pieceRow, pieceColumn]{ piece->getBoardPosition() };
-            if (piece && piece->getColor() == color && piece->getType() == PieceType::pawn &&
-                    pawnHasLegalMoves(board, piece.value(), pieceRow, pieceColumn))
+            if (piece && piece->getColor() == color &&
+                piece->getType() == PieceType::pawn &&
+                pawnHasLegalMoves(board, piece.value(), pieceRow, pieceColumn))
                 return true;
-            else if (piece && piece->getColor() == color && piece->getType() == PieceType::knight &&
-                    knightHasLegalMoves(board, piece.value(), pieceRow, pieceColumn))
+            else if (piece && piece->getColor() == color &&
+                     piece->getType() == PieceType::knight &&
+                     knightHasLegalMoves(board, piece.value(), pieceRow,
+                                         pieceColumn))
                 return true;
-            else if (piece && piece->getColor() == color && piece->getType() == PieceType::bishop &&
-                    bishopHasLegalMoves(board, piece.value(), pieceRow, pieceColumn))
+            else if (piece && piece->getColor() == color &&
+                     piece->getType() == PieceType::bishop &&
+                     bishopHasLegalMoves(board, piece.value(), pieceRow,
+                                         pieceColumn))
                 return true;
-            else if (piece && piece->getColor() == color && piece->getType() == PieceType::rook &&
-                    rookHasLegalMoves(board, piece.value(), pieceRow, pieceColumn))
+            else if (piece && piece->getColor() == color &&
+                     piece->getType() == PieceType::rook &&
+                     rookHasLegalMoves(board, piece.value(), pieceRow,
+                                       pieceColumn))
                 return true;
-            else if (piece && piece->getColor() == color && piece->getType() == PieceType::queen &&
-                    rookHasLegalMoves(board, piece.value(), pieceRow, pieceColumn) &&
-                    bishopHasLegalMoves(board, piece.value(), pieceRow, pieceColumn))
+            else if (piece && piece->getColor() == color &&
+                     piece->getType() == PieceType::queen &&
+                     rookHasLegalMoves(board, piece.value(), pieceRow,
+                                       pieceColumn) &&
+                     bishopHasLegalMoves(board, piece.value(), pieceRow,
+                                         pieceColumn))
                 return true;
-            else if (piece && piece->getColor() == color && piece->getType() == PieceType::king &&
-                    kingHasLegalMoves(board, piece.value(), pieceRow, pieceColumn))
+            else if (piece && piece->getColor() == color &&
+                     piece->getType() == PieceType::king &&
+                     kingHasLegalMoves(board, piece.value(), pieceRow,
+                                       pieceColumn))
                 return true;
         }
     }
@@ -155,9 +168,10 @@ bool playerHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, PieceC
     return false;
 }
 
-bool isKingCheckmated(const std::array<std::array<Tile, 8>, 8>& board, PieceColor kingColor)
+bool isKingCheckmated(const TileBoard& board, PieceColor kingColor)
 {
-    bool isCheckmated{ isKingInCheck(board, kingColor) && !playerHasLegalMoves(board, kingColor) };
+    bool isCheckmated{ isKingInCheck(board, kingColor) &&
+                       !playerHasLegalMoves(board, kingColor) };
 
     return isCheckmated;
 }

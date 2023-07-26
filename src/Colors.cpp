@@ -7,3 +7,11 @@ TileColor getTileColor(int x, int y)
 
     return TileColor::light;
 }
+
+void changeCurrentMoveColor(PieceColor& color)
+{
+    if (color == PieceColor::white)
+        color = PieceColor::black;
+    else
+        color = PieceColor::white;
+}

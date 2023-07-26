@@ -1,12 +1,12 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "DrawColor.h"
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #include <string>
+
+#include "DrawColor.h"
 
 class Renderer
 {
@@ -16,8 +16,8 @@ public:
     void clear();
     void present();
 
-    void setDrawColor(unsigned char red, unsigned char green, unsigned char blue,
-            unsigned char alpha);
+    void setDrawColor(unsigned char red, unsigned char green,
+                      unsigned char blue, unsigned char alpha);
     void setDrawColor(const DrawColor& color);
 
     void fillRect(const SDL_Rect& rectangle);
@@ -26,7 +26,8 @@ public:
 
     SDL_Texture* loadTexture(const std::string& path);
     // source and destination can be null, hence pass by pointer
-    void copyTexture(SDL_Texture* texture, const SDL_Rect* source, const SDL_Rect* destination);
+    void copyTexture(SDL_Texture* texture, const SDL_Rect* source,
+                     const SDL_Rect* destination);
 
     ~Renderer();
 

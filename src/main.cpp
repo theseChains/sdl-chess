@@ -1,7 +1,7 @@
-#include "Application.h"
-
-#include <iostream>
 #include <exception>
+#include <iostream>
+
+#include "Application.h"
 
 int main()
 {

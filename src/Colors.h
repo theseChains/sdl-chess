@@ -6,7 +6,7 @@
 enum class TileColor
 {
     light,
-    dark,
+    dark
 };
 
 enum class PieceColor
@@ -17,5 +17,6 @@ enum class PieceColor
 };
 
 TileColor getTileColor(int x, int y);
+void changeCurrentMoveColor(PieceColor& color);
 
 #endif

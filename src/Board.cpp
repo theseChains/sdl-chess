@@ -1,5 +1,8 @@
 #include "Board.h"
 
+#include <algorithm>
+#include <iostream>
+
 #include "Colors.h"
 #include "Constants.h"
 #include "KingCastleLogic.h"
@@ -8,27 +11,25 @@
 #include "MoveValidator.h"
 #include "PawnMovementLogic.h"
 #include "PieceArrangement.h"
+#include "PositionConversions.h"
 #include "PromotionOperations.h"
 
-#include <algorithm>
-#include <iostream>
-
 Board::Board(TextureTable& table, Renderer& renderer)
-    : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none }
-    , m_textureTable{ table }
-    , m_renderer{ renderer }
-    , m_positions{}
+    : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none },
+      m_textureTable{ table },
+      m_renderer{ renderer },
+      m_positions{}
 {
-    for (int i{ 0 }; i < 8; ++i)
-        for (int j{ 0 }; j < 8; ++j)
+    for (int i{ 0 }; i < constants::boardSize; ++i)
+        for (int j{ 0 }; j < constants::boardSize; ++j)
             initializeTile(m_textureTable, i, j);
 }
 
 void Board::draw()
 {
-    for (int i{ 0 }; i < 8; ++i)
+    for (int i{ 0 }; i < constants::boardSize; ++i)
     {
-        for (int j{ 0 }; j < 8; ++j)
+        for (int j{ 0 }; j < constants::boardSize; ++j)
         {
             m_renderer.setDrawColor(m_board[i][j].getConvertedColor());
             m_renderer.fillAndDrawRect(m_board[i][j].getRectangle());
@@ -36,9 +37,9 @@ void Board::draw()
     }
 
     // render pieces on top of the board
-    for (int i{ 0 }; i < 8; ++i)
+    for (int i{ 0 }; i < constants::boardSize; ++i)
     {
-        for (int j{ 0 }; j < 8; ++j)
+        for (int j{ 0 }; j < constants::boardSize; ++j)
         {
             auto piece{ m_board[i][j].getPiece() };
             if (piece)
@@ -50,30 +51,13 @@ void Board::draw()
         drawPromotionPieces(m_board, m_textureTable, m_renderer, m_lastMove);
 }
 
-void changeCurrentMoveColor(PieceColor& color)
-{
-    if (color == PieceColor::white)
-        color = PieceColor::black;
-    else
-        color = PieceColor::white;
-}
-
-std::pair<int, int> getBoardPositionFromMouse(SDL_Point mousePosition)
-{
-    // in case user clicks on the edge of the screen
-    if (mousePosition.x == 0)
-        mousePosition.x = 1;
-    if (mousePosition.y == 0)
-        mousePosition.y = 1;
-
-    return { mousePosition.y / 100, mousePosition.x / 100 };
-}
-
 void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
-        PieceColor currentColorToMove)
+                                   PieceColor currentColorToMove)
 {
     auto [boardRow, boardColumn]{ getBoardPositionFromMouse(mousePosition) };
-    auto tile{ findTile({ boardRow * 100, boardColumn * 100 }) };
+    std::pair<int, int> tilePosition{ convertToScreenPosition(
+        { boardRow, boardColumn }) };
+    auto tile{ findTile(tilePosition) };
     auto piece{ tile->get().getPiece() };
     if (piece && piece->getColor() == currentColorToMove)
     {
@@ -89,14 +73,17 @@ void Board::checkForPromotionPieceSelection(SDL_Point mousePosition)
     if (boardColumn != pawnColumn || std::abs(boardRow - pawnRow) > 3)
         return;
 
-    auto pawnTile{ findTile({ pawnRow * 100, pawnColumn * 100 }) };
+    std::pair<int, int> pawnTilePosition{ convertToScreenPosition(
+        { pawnRow, pawnColumn }) };
+    auto pawnTile{ findTile(pawnTilePosition) };
     handlePromotedPieceSelection(pawnTile->get(), m_textureTable, boardRow,
-            pawnRow, pawnColumn);
+                                 pawnRow, pawnColumn);
 
     m_promotingPawn = false;
 }
 
-std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> position)
+std::optional<std::reference_wrapper<Tile>> Board::findTile(
+    std::pair<int, int> position)
 {
     for (auto& row : m_board)
     {
@@ -110,33 +97,45 @@ std::optional<std::reference_wrapper<Tile>> Board::findTile(std::pair<int, int> 
     return std::nullopt;
 }
 
-void Board::placePieceAtChosenTile(int newRow, int newColumn, const std::optional<Piece>& piece)
+void Board::placePieceAtChosenTile(int newRow, int newColumn,
+                                   const std::optional<Piece>& piece)
 {
     // todo: add exceptions here? might have bad optional access here
     // and wherever this funciton is called
-    auto chosenTile{ findTile({ newRow * 100, newColumn * 100 }) };
+    std::pair<int, int> chosenTilePosition{ convertToScreenPosition(
+        { newRow, newColumn }) };
+    auto chosenTile{ findTile(chosenTilePosition) };
     chosenTile->get().placePiece(piece.value());
-    chosenTile->get().getPiece()->setBoardPosition({ newRow, newColumn });
+    chosenTile->get().getPiece()->setPositionFromBoardPosition(
+        { newRow, newColumn });
     chosenTile->get().getPiece()->deselect();
 }
 
-void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColumn,
-        bool& pieceSelected, PieceColor& currentColorToMove)
+void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
+                           int newColumn, bool& pieceSelected,
+                           PieceColor& currentColorToMove)
 {
     auto piece{ tile.getPiece() };
 
+    // could add something like if (!piece || !pieceIsSelected) return;
+
     if (piece && piece->isSelected() &&
-        (MoveValidator::moveIsValid(m_board, piece.value(), newRow, newColumn) ||
-         canTakeEnPassant(m_board, piece.value(), newRow, newColumn, m_lastMove)) &&
+        (MoveValidator::moveIsValid(m_board, piece.value(), newRow,
+                                    newColumn) ||
+         canTakeEnPassant(m_board, piece.value(), newRow, newColumn,
+                          m_lastMove)) &&
         !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
     {
         auto [oldRow, oldColumn]{ piece->getBoardPosition() };
-        m_lastMove = { { oldRow, oldColumn }, { newRow, newColumn }, piece->getType() };
+        m_lastMove = { { oldRow, oldColumn },
+                       { newRow, newColumn },
+                       piece->getType() };
 
         tile.removePiece();
         m_board[newRow][newColumn].removePiece();
         placePieceAtChosenTile(newRow, newColumn, piece);
-        if (piece->getType() == PieceType::king && std::abs(oldColumn - newColumn) == 2)
+        if (piece->getType() == PieceType::king &&
+            std::abs(oldColumn - newColumn) == 2)
             moveRookForCastling(m_board, newRow, newColumn);
 
         if (piece->getType() == PieceType::pawn &&
@@ -184,7 +183,7 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColum
 }
 
 void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
-        PieceColor& currentColorToMove)
+                                  PieceColor& currentColorToMove)
 {
     if (currentColorToMove == PieceColor::noColor)
         return;
@@ -197,14 +196,15 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
         {
             // bit of a hack i guess..
             bool keepGoing = true;
-            checkBoardTile(tile, keepGoing, newRow, newColumn, pieceSelected, currentColorToMove);
+            checkBoardTile(tile, keepGoing, newRow, newColumn, pieceSelected,
+                           currentColorToMove);
             if (!keepGoing)
                 return;
         }
     }
 }
 
-std::array<std::array<Tile, 8>, 8>& Board::getTiles()
+TileBoard& Board::getTiles()
 {
     return m_board;
 }
@@ -218,13 +218,15 @@ void Board::initializeTile(TextureTable& table, int i, int j)
 {
     auto [color, type]{ config::arrangement[i][j] };
     TileColor tileColor{ getTileColor(i, j) };
-    auto [tileRow, tileColumn]{ std::make_pair(i * 100, j * 100) };
+    auto [tileRow, tileColumn]{ convertToScreenPosition({ i, j }) };
 
     if (type == PieceType::none)
         m_board[i][j] = { tileColor, std::nullopt, { tileRow, tileColumn } };
     else
     {
-        Piece piece{ type, color, table[{ color, type }], { tileRow, tileColumn } };
+        Piece piece{
+            type, color, table[{ color, type }], { tileRow, tileColumn }
+        };
         m_board[i][j] = { tileColor, piece, { tileRow, tileColumn } };
     }
 }

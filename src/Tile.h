@@ -1,21 +1,22 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include "DrawColor.h"
-#include "Piece.h"
-#include "Colors.h"
-
 #include <SDL2/SDL.h>
 
 #include <optional>
 #include <tuple>
+
+#include "Colors.h"
+#include "DrawColor.h"
+#include "Piece.h"
 
 class Tile
 {
 public:
     // todo: remove this
     Tile() = default;
-    Tile(TileColor color, const std::optional<Piece>& piece, std::pair<int, int> position);
+    Tile(TileColor color, const std::optional<Piece>& piece,
+         std::pair<int, int> position);
 
     const SDL_Rect& getRectangle() const;
     SDL_Rect& getRectangle();

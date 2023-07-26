@@ -6,8 +6,8 @@
 
 #include "Board.h"
 #include "Constants.h"
-#include "TextureTable.h"
 #include "Renderer.h"
+#include "TextureTable.h"
 #include "UserInput.h"
 #include "Window.h"
 

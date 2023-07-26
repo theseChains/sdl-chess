@@ -3,13 +3,13 @@
 
 #include <array>
 
-#include "Tile.h"
+#include "Aliases.h"
 #include "Colors.h"
+#include "Tile.h"
 
-bool kingCanCastle(const std::array<std::array<Tile, 8>, 8>& board,
-        int kingRow, int kingColumn, int newRow, int newColumn, PieceColor kingColor);
+bool kingCanCastle(const TileBoard& board, int kingRow, int kingColumn,
+                   int newRow, int newColumn, PieceColor kingColor);
 
-void moveRookForCastling(std::array<std::array<Tile, 8>, 8>& board, int kingRow,
-        int newKingColumn);
+void moveRookForCastling(TileBoard& board, int kingRow, int newKingColumn);
 
 #endif

@@ -3,9 +3,9 @@
 
 #include "KingCheckLogic.h"
 
-bool kingHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, const Piece& king,
-        int currentRow, int currentColumn);
-bool playerHasLegalMoves(const std::array<std::array<Tile, 8>, 8>& board, PieceColor color);
-bool isKingCheckmated(const std::array<std::array<Tile, 8>, 8>& board, PieceColor kingColor);
+bool kingHasLegalMoves(const TileBoard& board, const Piece& king,
+                       int currentRow, int currentColumn);
+bool playerHasLegalMoves(const TileBoard& board, PieceColor color);
+bool isKingCheckmated(const TileBoard& board, PieceColor kingColor);
 
 #endif

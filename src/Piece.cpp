@@ -1,13 +1,18 @@
 #include "Piece.h"
 
 #include "Constants.h"
+#include "PositionConversions.h"
 
-Piece::Piece(PieceType type, PieceColor color, SDL_Texture* texture, std::pair<int, int> position)
-    : m_type{ type }, m_color{ color}, m_texture{ texture }, m_position{ position }
+Piece::Piece(PieceType type, PieceColor color, SDL_Texture* texture,
+             std::pair<int, int> position)
+    : m_type{ type },
+      m_color{ color },
+      m_texture{ texture },
+      m_position{ position }
 {
     // switch x and y for rectangle position
-    m_rectangle = { position.second, position.first, constants::windowWidth / constants::boardSize,
-        constants::windowHeight / constants::boardSize };
+    m_rectangle = { position.second, position.first, constants::tileWidth,
+                    constants::tileHeight };
 }
 
 void Piece::draw(Renderer& renderer)
@@ -28,12 +33,10 @@ void Piece::setPosition(std::pair<int, int> position)
     m_rectangle.y = position.first;
 }
 
-void Piece::setBoardPosition(std::pair<int, int> position)
+void Piece::setPositionFromBoardPosition(std::pair<int, int> position)
 {
-    m_position = { position.first * 100, position.second * 100 };
-    // switch the order for proper rendering
-    m_rectangle.x = position.second * 100;
-    m_rectangle.y = position.first * 100;
+    position = convertToScreenPosition(position);
+    setPosition(position);
 }
 
 void Piece::setHasMoved()
@@ -53,7 +56,7 @@ std::pair<int, int> Piece::getPosition() const
 
 std::pair<int, int> Piece::getBoardPosition() const
 {
-    return { m_position.first / 100, m_position.second / 100 };
+    return convertToBoardPosition(m_position);
 }
 
 PieceColor Piece::getColor() const
