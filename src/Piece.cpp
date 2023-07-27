@@ -10,8 +10,8 @@ Piece::Piece(PieceType type, PieceColor color, SDL_Texture* texture,
       m_texture{ texture },
       m_position{ position }
 {
-    // switch x and y for rectangle position
-    m_rectangle = { position.second, position.first, constants::tileWidth,
+    auto [rectangleX, rectangleY]{ convertToRectanglePosition(position) };
+    m_rectangle = { rectangleX, rectangleY, constants::tileWidth,
                     constants::tileHeight };
 }
 
@@ -28,9 +28,9 @@ SDL_Rect& Piece::getRectangle()
 void Piece::setPosition(std::pair<int, int> position)
 {
     m_position = position;
-    // switch the order for proper rendering
-    m_rectangle.x = position.second;
-    m_rectangle.y = position.first;
+    auto [rectangleX, rectangleY]{ convertToRectanglePosition(position) };
+    m_rectangle.x = rectangleX;
+    m_rectangle.y = rectangleY;
 }
 
 void Piece::setPositionFromBoardPosition(std::pair<int, int> position)

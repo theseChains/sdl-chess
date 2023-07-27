@@ -18,3 +18,8 @@ std::pair<int, int> convertToScreenPosition(std::pair<int, int> position)
     return { position.first * constants::screenPositionMultiplier,
              position.second * constants::screenPositionMultiplier };
 }
+
+std::pair<int, int> convertToRectanglePosition(std::pair<int, int> position)
+{
+    return { position.second, position.first };
+}

@@ -1,13 +1,14 @@
 #include "Tile.h"
 
 #include "Constants.h"
+#include "PositionConversions.h"
 
 Tile::Tile(TileColor color, const std::optional<Piece>& piece,
            std::pair<int, int> position)
     : m_color{ color }, m_piece{ piece }, m_position{ position }
 {
-    // switch the x and y for rectangle position
-    m_rectangle = { position.second, position.first, constants::tileWidth,
+    auto [rectangleX, rectangleY]{ convertToRectanglePosition(position) };
+    m_rectangle = { rectangleX, rectangleY, constants::tileWidth,
                     constants::tileHeight };
 }
 

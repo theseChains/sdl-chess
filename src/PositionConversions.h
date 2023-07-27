@@ -6,5 +6,6 @@
 std::pair<int, int> getBoardPositionFromMouse(SDL_Point mousePosition);
 std::pair<int, int> convertToBoardPosition(std::pair<int, int> position);
 std::pair<int, int> convertToScreenPosition(std::pair<int, int> position);
+std::pair<int, int> convertToRectanglePosition(std::pair<int, int> position);
 
 #endif
