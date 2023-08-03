@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Aliases.h"
+#include "BoardDrawer.h"
 #include "Move.h"
 #include "Renderer.h"
 #include "TextureTable.h"
@@ -31,11 +32,12 @@ public:
     bool promotingPawn() const;
 
 private:
-    TileBoard m_board{};
+    TileBoard m_tileBoard{};
     Move m_lastMove{};
     TextureTable& m_textureTable;
     Renderer& m_renderer;
     std::vector<TileBoard> m_positions{};
+    BoardDrawer m_boardDrawer;
 
     bool m_promotingPawn{ false };
 

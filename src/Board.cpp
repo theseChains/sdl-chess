@@ -18,7 +18,8 @@ Board::Board(TextureTable& table, Renderer& renderer)
     : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none },
       m_textureTable{ table },
       m_renderer{ renderer },
-      m_positions{}
+      m_positions{},
+      m_boardDrawer{ table, renderer, m_tileBoard }
 {
     for (int i{ 0 }; i < constants::boardSize; ++i)
         for (int j{ 0 }; j < constants::boardSize; ++j)
@@ -27,28 +28,11 @@ Board::Board(TextureTable& table, Renderer& renderer)
 
 void Board::draw()
 {
-    for (int i{ 0 }; i < constants::boardSize; ++i)
-    {
-        for (int j{ 0 }; j < constants::boardSize; ++j)
-        {
-            m_renderer.setDrawColor(m_board[i][j].getConvertedColor());
-            m_renderer.fillAndDrawRect(m_board[i][j].getRectangle());
-        }
-    }
-
-    // render pieces on top of the board
-    for (int i{ 0 }; i < constants::boardSize; ++i)
-    {
-        for (int j{ 0 }; j < constants::boardSize; ++j)
-        {
-            auto piece{ m_board[i][j].getPiece() };
-            if (piece)
-                piece.value().draw(m_renderer);
-        }
-    }
+    m_boardDrawer.draw();
 
     if (m_promotingPawn)
-        drawPromotionPieces(m_board, m_textureTable, m_renderer, m_lastMove);
+        drawPromotionPieces(m_tileBoard, m_textureTable, m_renderer,
+                            m_lastMove);
 }
 
 void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
@@ -85,7 +69,7 @@ void Board::checkForPromotionPieceSelection(SDL_Point mousePosition)
 std::optional<std::reference_wrapper<Tile>> Board::findTile(
     std::pair<int, int> position)
 {
-    for (auto& row : m_board)
+    for (auto& row : m_tileBoard)
     {
         for (auto& tile : row)
         {
@@ -120,11 +104,11 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
     // could add something like if (!piece || !pieceIsSelected) return;
 
     if (piece && piece->isSelected() &&
-        (MoveValidator::moveIsValid(m_board, piece.value(), newRow,
+        (MoveValidator::moveIsValid(m_tileBoard, piece.value(), newRow,
                                     newColumn) ||
-         canTakeEnPassant(m_board, piece.value(), newRow, newColumn,
+         canTakeEnPassant(m_tileBoard, piece.value(), newRow, newColumn,
                           m_lastMove)) &&
-        !kingWillBeInCheck(m_board, piece.value(), newRow, newColumn))
+        !kingWillBeInCheck(m_tileBoard, piece.value(), newRow, newColumn))
     {
         auto [oldRow, oldColumn]{ piece->getBoardPosition() };
         m_lastMove = { { oldRow, oldColumn },
@@ -132,24 +116,26 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
                        piece->getType() };
 
         tile.removePiece();
-        m_board[newRow][newColumn].removePiece();
+        m_tileBoard[newRow][newColumn].removePiece();
         placePieceAtChosenTile(newRow, newColumn, piece);
         if (piece->getType() == PieceType::king &&
             std::abs(oldColumn - newColumn) == 2)
-            moveRookForCastling(m_board, newRow, newColumn);
+            moveRookForCastling(m_tileBoard, newRow, newColumn);
 
         if (piece->getType() == PieceType::pawn &&
-            pawnIsPromoting(m_board, newRow, newColumn))
+            pawnIsPromoting(m_tileBoard, newRow, newColumn))
             m_promotingPawn = true;
 
         pieceSelected = false;
 
-        Piece& pieceReference{ m_board[newRow][newColumn].getPiece().value() };
+        Piece& pieceReference{
+            m_tileBoard[newRow][newColumn].getPiece().value()
+        };
         pieceReference.setHasMoved();
 
         changeCurrentMoveColor(currentColorToMove);
         // change this stuff to checkForGameEnd() or something
-        if (isKingCheckmated(m_board, currentColorToMove))
+        if (isKingCheckmated(m_tileBoard, currentColorToMove))
         {
             if (currentColorToMove == PieceColor::white)
                 std::cout << "white king is checkmated, black wins!\n";
@@ -159,15 +145,16 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
             currentColorToMove = PieceColor::noColor;
         }
 
-        if (!isKingInCheck(m_board, currentColorToMove) &&
-            !playerHasLegalMoves(m_board, currentColorToMove))
+        if (!isKingInCheck(m_tileBoard, currentColorToMove) &&
+            !playerHasLegalMoves(m_tileBoard, currentColorToMove))
         {
             std::cout << "draw by stalemate\n";
             currentColorToMove = PieceColor::noColor;
         }
 
-        m_positions.push_back(m_board);
-        if (std::count(m_positions.begin(), m_positions.end(), m_board) >= 3)
+        m_positions.push_back(m_tileBoard);
+        if (std::count(m_positions.begin(), m_positions.end(), m_tileBoard) >=
+            3)
         {
             std::cout << "draw by three-fold repetition\n";
             currentColorToMove = PieceColor::noColor;
@@ -190,7 +177,7 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
 
     auto [newRow, newColumn]{ getBoardPositionFromMouse(mousePosition) };
 
-    for (auto& row : m_board)
+    for (auto& row : m_tileBoard)
     {
         for (auto& tile : row)
         {
@@ -206,7 +193,7 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
 
 TileBoard& Board::getTiles()
 {
-    return m_board;
+    return m_tileBoard;
 }
 
 bool Board::promotingPawn() const
@@ -221,12 +208,14 @@ void Board::initializeTile(TextureTable& table, int i, int j)
     auto [tileRow, tileColumn]{ convertToScreenPosition({ i, j }) };
 
     if (type == PieceType::none)
-        m_board[i][j] = { tileColor, std::nullopt, { tileRow, tileColumn } };
+        m_tileBoard[i][j] = { tileColor,
+                              std::nullopt,
+                              { tileRow, tileColumn } };
     else
     {
         Piece piece{
             type, color, table[{ color, type }], { tileRow, tileColumn }
         };
-        m_board[i][j] = { tileColor, piece, { tileRow, tileColumn } };
+        m_tileBoard[i][j] = { tileColor, piece, { tileRow, tileColumn } };
     }
 }
