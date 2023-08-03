@@ -3,6 +3,8 @@
 
 namespace constants
 {
+    inline constexpr int noEventAvailable{ 0 };
+    inline constexpr int renderDriverIndex{ -1 };
     inline constexpr int windowWidth{ 800 };
     inline constexpr int windowHeight{ 800 };
     inline constexpr int boardSize{ 8 };
