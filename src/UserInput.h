@@ -15,7 +15,6 @@ public:
 
 private:
     SDL_Point m_mousePosition{};
-    // could probably move those variables out of here..
     bool m_pieceSelected{ false };
     PieceColor m_currentColorToMove{ PieceColor::white };
 };

@@ -7,7 +7,9 @@ void UserInput::handleEvent(SDL_Event& event, Board& board)
 
     if (event.type == SDL_MOUSEBUTTONDOWN && board.promotingPawn() &&
         event.button.button == SDL_BUTTON_LEFT)
+    {
         board.checkForPromotionPieceSelection(m_mousePosition);
+    }
     else if (event.type == SDL_MOUSEBUTTONDOWN && !m_pieceSelected &&
              event.button.button == SDL_BUTTON_LEFT)
     {

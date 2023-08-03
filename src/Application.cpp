@@ -5,7 +5,7 @@
 
 Application::Application()
     : m_window{ constants::windowWidth, constants::windowHeight },
-      m_renderer{ m_window.getWindow(), -1,
+      m_renderer{ m_window.getWindow(), constants::renderDriverIndex,
                   SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE },
       m_textures{ m_renderer },
       m_board{ m_textures, m_renderer },
@@ -26,7 +26,7 @@ void Application::run()
 void Application::processInput(bool& keepRunning)
 {
     SDL_Event event{};
-    while (SDL_PollEvent(&event) != 0)
+    while (SDL_PollEvent(&event) != constants::noEventAvailable)
     {
         if (event.type == SDL_QUIT)
             keepRunning = false;
