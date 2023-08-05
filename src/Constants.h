@@ -17,6 +17,12 @@ namespace constants
     inline constexpr int blackPawnStartRow{ 1 };
     inline constexpr int topRow{ 0 };
     inline constexpr int bottomRow{ 7 };
+
+    inline constexpr int numberOfPromotionPieces{ 4 };
+    inline constexpr int promotionQueenPositionDifference{ 0 };
+    inline constexpr int promotionRookPositionDifference{ 1 };
+    inline constexpr int promotionBishopPositionDifference{ 2 };
+    inline constexpr int promotionKnightPositionDifference{ 3 };
 }
 
 #endif
