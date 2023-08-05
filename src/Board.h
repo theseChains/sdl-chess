@@ -6,6 +6,7 @@
 
 #include "Aliases.h"
 #include "BoardDrawer.h"
+#include "GameLogic.h"
 #include "Move.h"
 #include "Renderer.h"
 #include "TextureTable.h"
@@ -37,13 +38,14 @@ private:
     Renderer& m_renderer;
     std::vector<TileBoard> m_positions{};
     BoardDrawer m_boardDrawer;
+    GameLogic m_gameLogic;
 
     bool m_promotingPawn{ false };
 
     void initializeTile(TextureTable& table, int i, int j);
     void placePieceAtChosenTile(int newRow, int newColumn,
                                 const std::optional<Piece>& piece);
-    void checkBoardTile(Tile& tile, bool& keepGoing, int newRow, int newColumn,
+    bool checkBoardTile(Tile& tile, int newRow, int newColumn,
                         bool& pieceSelected, PieceColor& currentColorToMove);
 };
 

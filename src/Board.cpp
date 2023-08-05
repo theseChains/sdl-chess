@@ -6,20 +6,16 @@
 #include "Colors.h"
 #include "Constants.h"
 #include "KingCastleLogic.h"
-#include "KingCheckLogic.h"
-#include "KingMateLogic.h"
-#include "MoveValidator.h"
-#include "PawnMovementLogic.h"
 #include "PieceArrangement.h"
 #include "PositionConversions.h"
-#include "PromotionOperations.h"
 
 Board::Board(TextureTable& table, Renderer& renderer)
     : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none },
       m_textureTable{ table },
       m_renderer{ renderer },
       m_positions{},
-      m_boardDrawer{ table, renderer, m_tileBoard }
+      m_boardDrawer{ table, renderer, m_tileBoard },
+      m_gameLogic{ m_tileBoard, m_lastMove }
 {
     for (int i{ 0 }; i < constants::boardSize; ++i)
         for (int j{ 0 }; j < constants::boardSize; ++j)
@@ -97,10 +93,7 @@ void Board::highlightValidMoves(const Piece& piece)
     {
         for (int j{ 0 }; j < constants::boardSize; ++j)
         {
-            if ((MoveValidator::moveIsValid(m_tileBoard, piece, i, j) ||
-                 canTakeEnPassant(m_tileBoard, piece, i, j, m_lastMove,
-                                  false)) &&
-                !kingWillBeInCheck(m_tileBoard, piece, i, j))
+            if (m_gameLogic.playerMoveIsValid(piece, i, j))
             {
                 m_tileBoard[i][j].highlight();
             }
@@ -115,80 +108,51 @@ void Board::resetMoveHighlight()
             tile.dehighlight();
 }
 
-void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
-                           int newColumn, bool& pieceSelected,
-                           PieceColor& currentColorToMove)
+bool Board::checkBoardTile(Tile& tile, int newRow, int newColumn,
+                           bool& pieceSelected, PieceColor& currentColorToMove)
 {
     auto piece{ tile.getPiece() };
     if (!piece || !piece->isSelected())
-        return;
+        return true;
 
-    // could add something like if (!piece || !pieceIsSelected) return;
-
-    if ((MoveValidator::moveIsValid(m_tileBoard, piece.value(), newRow,
-                                    newColumn) ||
-         canTakeEnPassant(m_tileBoard, piece.value(), newRow, newColumn,
-                          m_lastMove, true)) &&
-        !kingWillBeInCheck(m_tileBoard, piece.value(), newRow, newColumn))
+    if (m_gameLogic.playerMoveIsValid(piece.value(), newRow, newColumn))
     {
         auto [oldRow, oldColumn]{ piece->getBoardPosition() };
         m_lastMove = { { oldRow, oldColumn },
                        { newRow, newColumn },
                        piece->getType() };
 
+        if (m_gameLogic.playerTookEnPassant(piece.value(), newRow, newColumn,
+                                            oldRow, oldColumn))
+        {
+            m_tileBoard[oldRow][newColumn].removePiece();
+        }
+
         tile.removePiece();
         m_tileBoard[newRow][newColumn].removePiece();
         placePieceAtChosenTile(newRow, newColumn, piece);
-        if (piece->getType() == PieceType::king &&
-            std::abs(oldColumn - newColumn) == 2)
+        if (m_gameLogic.playerCastled(piece.value(), newColumn, oldColumn))
             moveRookForCastling(m_tileBoard, newRow, newColumn);
 
-        if (piece->getType() == PieceType::pawn &&
-            pawnIsPromoting(m_tileBoard, newRow, newColumn))
+        if (m_gameLogic.playerPromotingPawn(piece.value(), newRow, newColumn))
             m_promotingPawn = true;
 
         pieceSelected = false;
-
-        Piece& pieceReference{
-            m_tileBoard[newRow][newColumn].getPiece().value()
-        };
-        pieceReference.setHasMoved();
-
         changeCurrentMoveColor(currentColorToMove);
-        // change this stuff to checkForGameEnd() or something
-        if (isKingCheckmated(m_tileBoard, currentColorToMove))
-        {
-            if (currentColorToMove == PieceColor::white)
-                std::cout << "white king is checkmated, black wins!\n";
-            else
-                std::cout << "black king is checkmated, white wins!\n";
-
-            currentColorToMove = PieceColor::noColor;
-        }
-
-        if (!isKingInCheck(m_tileBoard, currentColorToMove) &&
-            !playerHasLegalMoves(m_tileBoard, currentColorToMove))
-        {
-            std::cout << "draw by stalemate\n";
-            currentColorToMove = PieceColor::noColor;
-        }
-
         m_positions.push_back(m_tileBoard);
-        if (std::count(m_positions.begin(), m_positions.end(), m_tileBoard) >=
-            3)
-        {
-            std::cout << "draw by three-fold repetition\n";
-            currentColorToMove = PieceColor::noColor;
-        }
-        keepGoing = false;
+        m_gameLogic.updatePieceProperties(newRow, newColumn);
+        currentColorToMove =
+            m_gameLogic.checkForGameEnd(m_positions, currentColorToMove);
     }
     else
     {
         tile.getPiece()->deselect();
         pieceSelected = false;
-        keepGoing = false;
     }
+
     resetMoveHighlight();
+
+    return false;
 }
 
 void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
@@ -203,12 +167,11 @@ void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
     {
         for (auto& tile : row)
         {
-            // bit of a hack i guess..
-            bool keepGoing = true;
-            checkBoardTile(tile, keepGoing, newRow, newColumn, pieceSelected,
-                           currentColorToMove);
-            if (!keepGoing)
+            if (!checkBoardTile(tile, newRow, newColumn, pieceSelected,
+                                currentColorToMove))
+            {
                 return;
+            }
         }
     }
 }
