@@ -19,7 +19,6 @@ bool whitePawnMoveIsValid(const TileBoard& board, int pawnRow, int pawnColumn,
 
         return false;
     }
-    // new tile doesn't have a piece or the piece is white
     else
     {
         if (pawnColumn != newColumn || pawnRow == newRow)
@@ -54,7 +53,6 @@ bool blackPawnMoveIsValid(const TileBoard& board, int pawnRow, int pawnColumn,
 
         return false;
     }
-    // new tile doesn't have a piece or the piece is black
     else
     {
         if (pawnColumn != newColumn || pawnRow == newRow)
@@ -75,7 +73,7 @@ bool blackPawnMoveIsValid(const TileBoard& board, int pawnRow, int pawnColumn,
 }
 
 bool canTakeEnPassant(TileBoard& board, const Piece& piece, int newRow,
-                      int newColumn, const Move& lastMove)
+                      int newColumn, const Move& lastMove, bool shouldTakePiece)
 {
     if (piece.getType() != PieceType::pawn ||
         lastMove.pieceType != PieceType::pawn)
@@ -103,7 +101,8 @@ bool canTakeEnPassant(TileBoard& board, const Piece& piece, int newRow,
     if (lastMove.from != pawnToCaptureStartingPosition)
         return false;
 
-    board[oldRow][newColumn].removePiece();
+    if (shouldTakePiece)
+        board[oldRow][newColumn].removePiece();
 
     return true;
 }

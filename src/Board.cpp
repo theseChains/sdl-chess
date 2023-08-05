@@ -31,8 +31,7 @@ void Board::draw()
     m_boardDrawer.draw();
 
     if (m_promotingPawn)
-        drawPromotionPieces(m_tileBoard, m_textureTable, m_renderer,
-                            m_lastMove);
+        m_boardDrawer.drawPromotion(m_lastMove);
 }
 
 void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
@@ -47,6 +46,7 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
     {
         tile->get().getPiece()->select();
         pieceSelected = true;
+        highlightValidMoves(piece.value());
     }
 }
 
@@ -95,6 +95,30 @@ void Board::placePieceAtChosenTile(int newRow, int newColumn,
     chosenTile->get().getPiece()->deselect();
 }
 
+void Board::highlightValidMoves(const Piece& piece)
+{
+    for (int i{ 0 }; i < constants::boardSize; ++i)
+    {
+        for (int j{ 0 }; j < constants::boardSize; ++j)
+        {
+            if ((MoveValidator::moveIsValid(m_tileBoard, piece, i, j) ||
+                 canTakeEnPassant(m_tileBoard, piece, i, j, m_lastMove,
+                                  false)) &&
+                !kingWillBeInCheck(m_tileBoard, piece, i, j))
+            {
+                m_tileBoard[i][j].highlight();
+            }
+        }
+    }
+}
+
+void Board::resetMoveHighlight()
+{
+    for (auto& row : m_tileBoard)
+        for (auto& tile : row)
+            tile.dehighlight();
+}
+
 void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
                            int newColumn, bool& pieceSelected,
                            PieceColor& currentColorToMove)
@@ -107,7 +131,7 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
         (MoveValidator::moveIsValid(m_tileBoard, piece.value(), newRow,
                                     newColumn) ||
          canTakeEnPassant(m_tileBoard, piece.value(), newRow, newColumn,
-                          m_lastMove)) &&
+                          m_lastMove, true)) &&
         !kingWillBeInCheck(m_tileBoard, piece.value(), newRow, newColumn))
     {
         auto [oldRow, oldColumn]{ piece->getBoardPosition() };
@@ -167,6 +191,7 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
         pieceSelected = false;
         keepGoing = false;
     }
+    resetMoveHighlight();
 }
 
 void Board::checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,

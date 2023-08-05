@@ -42,8 +42,8 @@ void BoardDrawer::drawBoardRectangles()
             if (currentTile.isHighlighted())
             {
                 // todo: make it look nicer i guess
-                auto [rectangleX, rectangleY]{
-                    convertToRectanglePosition(currentTile.getPosition()) };
+                auto [rectangleX, rectangleY]{ convertToRectanglePosition(
+                    currentTile.getPosition()) };
                 SDL_Rect validMoveRectangle{ rectangleX, rectangleY, 20, 20 };
                 m_renderer.setDrawColor(colors::green);
                 m_renderer.fillAndDrawRect(validMoveRectangle);

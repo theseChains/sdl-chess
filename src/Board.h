@@ -20,6 +20,8 @@ public:
 
     void draw();
 
+    void highlightValidMoves(const Piece& piece);
+    void resetMoveHighlight();
     void checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
                                 PieceColor curentColorToMove);
     void checkForPromotionPieceSelection(SDL_Point mousePosition);
