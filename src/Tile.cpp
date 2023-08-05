@@ -45,6 +45,11 @@ std::pair<int, int> Tile::getPosition() const
     return m_position;
 }
 
+bool Tile::isHighlighted() const
+{
+    return m_isHighlighted;
+}
+
 void Tile::removePiece()
 {
     m_piece = std::nullopt;
@@ -53,6 +58,16 @@ void Tile::removePiece()
 void Tile::placePiece(const Piece& piece)
 {
     m_piece = piece;
+}
+
+void Tile::highlight()
+{
+    m_isHighlighted = true;
+}
+
+void Tile::dehighlight()
+{
+    m_isHighlighted = false;
 }
 
 bool Tile::operator==(const Tile& other) const

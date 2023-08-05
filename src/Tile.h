@@ -24,9 +24,12 @@ public:
     const std::optional<Piece>& getPiece() const;
     std::optional<Piece>& getPiece();
     std::pair<int, int> getPosition() const;
+    bool isHighlighted() const;
 
     void removePiece();
     void placePiece(const Piece& piece);
+    void highlight();
+    void dehighlight();
 
     bool operator==(const Tile& other) const;
 
@@ -35,6 +38,7 @@ private:
     TileColor m_color{};
     std::optional<Piece> m_piece{};
     std::pair<int, int> m_position{};
+    bool m_isHighlighted{ false };
 };
 
 #endif
