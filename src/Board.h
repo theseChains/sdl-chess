@@ -2,8 +2,6 @@
 #define BOARD_H
 
 #include <array>
-#include <functional>
-#include <optional>
 #include <vector>
 
 #include "Aliases.h"
@@ -27,8 +25,7 @@ public:
     void checkForPromotionPieceSelection(SDL_Point mousePosition);
     void checkForPieceMovement(SDL_Point mousePosition, bool& pieceSelected,
                                PieceColor& curentColorToMove);
-    std::optional<std::reference_wrapper<Tile>> findTile(
-        std::pair<int, int> position);
+    Tile& getTileReferenceByPosition(std::pair<int, int> position);
 
     TileBoard& getTiles();
     bool promotingPawn() const;

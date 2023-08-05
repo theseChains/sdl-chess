@@ -40,11 +40,11 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
     auto [boardRow, boardColumn]{ getBoardPositionFromMouse(mousePosition) };
     std::pair<int, int> tilePosition{ convertToScreenPosition(
         { boardRow, boardColumn }) };
-    auto tile{ findTile(tilePosition) };
-    auto piece{ tile->get().getPiece() };
+    Tile& tile{ getTileReferenceByPosition(tilePosition) };
+    auto piece{ tile.getPiece() };
     if (piece && piece->getColor() == currentColorToMove)
     {
-        tile->get().getPiece()->select();
+        tile.getPiece()->select();
         pieceSelected = true;
         highlightValidMoves(piece.value());
     }
@@ -59,15 +59,14 @@ void Board::checkForPromotionPieceSelection(SDL_Point mousePosition)
 
     std::pair<int, int> pawnTilePosition{ convertToScreenPosition(
         { pawnRow, pawnColumn }) };
-    auto pawnTile{ findTile(pawnTilePosition) };
-    handlePromotedPieceSelection(pawnTile->get(), m_textureTable, boardRow,
-                                 pawnRow, pawnColumn);
+    Tile& pawnTile{ getTileReferenceByPosition(pawnTilePosition) };
+    handlePromotedPieceSelection(pawnTile, m_textureTable, boardRow, pawnRow,
+                                 pawnColumn);
 
     m_promotingPawn = false;
 }
 
-std::optional<std::reference_wrapper<Tile>> Board::findTile(
-    std::pair<int, int> position)
+Tile& Board::getTileReferenceByPosition(std::pair<int, int> position)
 {
     for (auto& row : m_tileBoard)
     {
@@ -78,21 +77,18 @@ std::optional<std::reference_wrapper<Tile>> Board::findTile(
         }
     }
 
-    return std::nullopt;
+    throw std::runtime_error{ "incorrect position for tile" };
 }
 
 void Board::placePieceAtChosenTile(int newRow, int newColumn,
                                    const std::optional<Piece>& piece)
 {
-    // todo: add exceptions here? might have bad optional access here
-    // and wherever this funciton is called
     std::pair<int, int> chosenTilePosition{ convertToScreenPosition(
         { newRow, newColumn }) };
-    auto chosenTile{ findTile(chosenTilePosition) };
-    chosenTile->get().placePiece(piece.value());
-    chosenTile->get().getPiece()->setPositionFromBoardPosition(
-        { newRow, newColumn });
-    chosenTile->get().getPiece()->deselect();
+    Tile& chosenTile{ getTileReferenceByPosition(chosenTilePosition) };
+    chosenTile.placePiece(piece.value());
+    chosenTile.getPiece()->setPositionFromBoardPosition({ newRow, newColumn });
+    chosenTile.getPiece()->deselect();
 }
 
 void Board::highlightValidMoves(const Piece& piece)
@@ -124,11 +120,12 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
                            PieceColor& currentColorToMove)
 {
     auto piece{ tile.getPiece() };
+    if (!piece || !piece->isSelected())
+        return;
 
     // could add something like if (!piece || !pieceIsSelected) return;
 
-    if (piece && piece->isSelected() &&
-        (MoveValidator::moveIsValid(m_tileBoard, piece.value(), newRow,
+    if ((MoveValidator::moveIsValid(m_tileBoard, piece.value(), newRow,
                                     newColumn) ||
          canTakeEnPassant(m_tileBoard, piece.value(), newRow, newColumn,
                           m_lastMove, true)) &&
@@ -185,7 +182,7 @@ void Board::checkBoardTile(Tile& tile, bool& keepGoing, int newRow,
         }
         keepGoing = false;
     }
-    else if (piece && piece->isSelected())
+    else
     {
         tile.getPiece()->deselect();
         pieceSelected = false;
