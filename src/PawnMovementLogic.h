@@ -13,7 +13,6 @@ bool whitePawnMoveIsValid(const TileBoard& board, int pawnRow, int pawnColumn,
 bool blackPawnMoveIsValid(const TileBoard& board, int pawnRow, int pawnColumn,
                           int newRow, int newColumn);
 bool canTakeEnPassant(TileBoard& board, const Piece& piece, int newRow,
-                      int newColumn, const Move& lastMove,
-                      bool shouldTakePiece);
+                      int newColumn, const Move& lastMove);
 
 #endif
