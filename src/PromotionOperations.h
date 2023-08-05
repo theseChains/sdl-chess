@@ -5,14 +5,23 @@
 
 #include "Aliases.h"
 #include "Move.h"
-#include "Renderer.h"
 #include "TextureTable.h"
 #include "Tile.h"
 
-bool pawnIsPromoting(TileBoard& board, int row, int column);
+struct PromotionPieces
+{
+    Piece queen;
+    Piece rook;
+    Piece bishop;
+    Piece knight;
+};
 
-void drawPromotionPieces(const TileBoard& board, TextureTable& table,
-                         Renderer& renderer, const Move& lastMove);
+PromotionPieces initializePromotionPieces(TextureTable& textureTable,
+                                          TileBoard& tileBoard,
+                                          const Move& lastMove);
+int getPromotionPieceScreenRow(int tileRow, PieceType type, PieceColor color);
+
+bool pawnIsPromoting(TileBoard& board, int row, int column);
 void handlePromotedPieceSelection(Tile& pawnTile, TextureTable& textureTable,
                                   int boardRow, int pawnRow, int pawnColumn);
 

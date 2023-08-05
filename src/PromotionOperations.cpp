@@ -1,6 +1,73 @@
 #include "PromotionOperations.h"
 
+#include <stdexcept>
+
 #include "Constants.h"
+#include "PositionConversions.h"
+
+PromotionPieces initializePromotionPieces(TextureTable& textureTable,
+                                          TileBoard& tileBoard,
+                                          const Move& lastMove)
+{
+    auto [pawnRow, pawnColumn]{ lastMove.to };
+    Piece pawn{ tileBoard[pawnRow][pawnColumn].getPiece().value() };
+    PieceColor color{ pawn.getColor() };
+    auto [tileRow,
+          tileColumn]{ convertToScreenPosition({ pawnRow, pawnColumn }) };
+    Piece queen{ PieceType::queen,
+                 color,
+                 textureTable[{ color, PieceType::queen }],
+                 { getPromotionPieceScreenRow(tileRow, PieceType::queen, color),
+                   tileColumn } };
+    Piece rook{ PieceType::rook,
+                color,
+                textureTable[{ color, PieceType::rook }],
+                { getPromotionPieceScreenRow(tileRow, PieceType::rook, color),
+                  tileColumn } };
+    Piece bishop{ PieceType::bishop,
+                  color,
+                  textureTable[{ color, PieceType::bishop }],
+                  { getPromotionPieceScreenRow(tileRow, PieceType::bishop,
+                                               color),
+                    tileColumn } };
+    Piece knight{ PieceType::knight,
+                  color,
+                  textureTable[{ color, PieceType::knight }],
+                  { getPromotionPieceScreenRow(tileRow, PieceType::knight,
+                                               color),
+                    tileColumn } };
+
+    return { queen, rook, bishop, knight };
+}
+
+int getPromotionPieceScreenRow(int tileRow, PieceType type, PieceColor color)
+{
+    int pieceScreenRow{ tileRow };
+    int direction{ color == PieceColor::white ? 1 : -1 };
+    int pawnTileDifference{};
+    switch (type)
+    {
+        case PieceType::queen:
+            pawnTileDifference = constants::promotionQueenPositionDifference;
+            break;
+        case PieceType::rook:
+            pawnTileDifference = constants::promotionRookPositionDifference;
+            break;
+        case PieceType::bishop:
+            pawnTileDifference = constants::promotionBishopPositionDifference;
+            break;
+        case PieceType::knight:
+            pawnTileDifference = constants::promotionKnightPositionDifference;
+            break;
+        default:
+            throw std::runtime_error{ "incorrect promotion piece" };
+    }
+
+    pieceScreenRow +=
+        pawnTileDifference * direction * constants::screenPositionMultiplier;
+
+    return pieceScreenRow;
+}
 
 bool pawnIsPromoting(TileBoard& board, int pawnRow, int pawnColumn)
 {
@@ -14,93 +81,43 @@ bool pawnIsPromoting(TileBoard& board, int pawnRow, int pawnColumn)
     return true;
 }
 
-void drawPromotionPieces(const TileBoard& board, TextureTable& textureTable,
-                         Renderer& renderer, const Move& lastMove)
-{
-    auto [pawnRow, pawnColumn]{ lastMove.to };
-    Piece pawn{ board[pawnRow][pawnColumn].getPiece().value() };
-    PieceColor color{ pawn.getColor() };
-    int tileRow{ pawnRow * 100 };
-    int tileColumn{ pawnColumn * 100 };
-    Piece queen{ PieceType::queen,
-                 color,
-                 textureTable[{ color, PieceType::queen }],
-                 { tileRow, tileColumn } };
-    Piece rook{ PieceType::rook,
-                color,
-                textureTable[{ color, PieceType::rook }],
-                { tileRow + (color == PieceColor::white ? 100 : -100),
-                  tileColumn } };
-    Piece bishop{ PieceType::bishop,
-                  color,
-                  textureTable[{ color, PieceType::bishop }],
-                  { tileRow + (color == PieceColor::white ? 200 : -200),
-                    tileColumn } };
-    Piece knight{ PieceType::knight,
-                  color,
-                  textureTable[{ color, PieceType::knight }],
-                  { tileRow + (color == PieceColor::white ? 300 : -300),
-                    tileColumn } };
-
-    renderer.setDrawColor(colors::white);
-    renderer.fillAndDrawRect(
-        { queen.getPosition().second, queen.getPosition().first,
-          constants::windowWidth / constants::boardSize,
-          constants::windowHeight / constants::boardSize });
-    renderer.fillAndDrawRect(
-        { rook.getPosition().second, rook.getPosition().first,
-          constants::windowWidth / constants::boardSize,
-          constants::windowHeight / constants::boardSize });
-    renderer.fillAndDrawRect(
-        { bishop.getPosition().second, bishop.getPosition().first,
-          constants::windowWidth / constants::boardSize,
-          constants::windowHeight / constants::boardSize });
-    renderer.fillAndDrawRect(
-        { knight.getPosition().second, knight.getPosition().first,
-          constants::windowWidth / constants::boardSize,
-          constants::windowHeight / constants::boardSize });
-
-    queen.draw(renderer);
-    rook.draw(renderer);
-    bishop.draw(renderer);
-    knight.draw(renderer);
-}
-
 void handlePromotedPieceSelection(Tile& pawnTile, TextureTable& textureTable,
                                   int boardRow, int pawnRow, int pawnColumn)
 {
     PieceColor color{ pawnTile.getPiece()->getColor() };
     pawnTile.removePiece();
-    if (boardRow == pawnRow)
+    std::pair<int, int> newPieceScreenPosition{ convertToScreenPosition(
+        { pawnRow, pawnColumn }) };
+    if (std::abs(boardRow - pawnRow) ==
+        constants::promotionQueenPositionDifference)
     {
-        Piece queen{ PieceType::queen,
-                     color,
+        Piece queen{ PieceType::queen, color,
                      textureTable[{ color, PieceType::queen }],
-                     { pawnRow * 100, pawnColumn * 100 } };
+                     newPieceScreenPosition };
         pawnTile.placePiece(queen);
     }
-    else if (std::abs(boardRow - pawnRow) == 1)
+    else if (std::abs(boardRow - pawnRow) ==
+             constants::promotionRookPositionDifference)
     {
-        Piece rook{ PieceType::rook,
-                    color,
+        Piece rook{ PieceType::rook, color,
                     textureTable[{ color, PieceType::rook }],
-                    { pawnRow * 100, pawnColumn * 100 } };
+                    newPieceScreenPosition };
         pawnTile.placePiece(rook);
     }
-    else if (std::abs(boardRow - pawnRow) == 2)
+    else if (std::abs(boardRow - pawnRow) ==
+             constants::promotionBishopPositionDifference)
     {
-        Piece bishop{ PieceType::bishop,
-                      color,
+        Piece bishop{ PieceType::bishop, color,
                       textureTable[{ color, PieceType::bishop }],
-                      { pawnRow * 100, pawnColumn * 100 } };
+                      newPieceScreenPosition };
         pawnTile.placePiece(bishop);
     }
-    else if (std::abs(boardRow - pawnRow) == 3)
+    else if (std::abs(boardRow - pawnRow) ==
+             constants::promotionKnightPositionDifference)
     {
-        Piece knight{ PieceType::knight,
-                      color,
+        Piece knight{ PieceType::knight, color,
                       textureTable[{ color, PieceType::knight }],
-                      { pawnRow * 100, pawnColumn * 100 } };
+                      newPieceScreenPosition };
         pawnTile.placePiece(knight);
     }
 }
