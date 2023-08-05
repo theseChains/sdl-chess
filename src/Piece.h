@@ -7,7 +7,6 @@
 
 #include "Colors.h"
 #include "PieceType.h"
-#include "Renderer.h"
 
 class Piece
 {
@@ -15,9 +14,9 @@ public:
     Piece(PieceType type, PieceColor color, SDL_Texture* texture,
           std::pair<int, int> position);
 
-    void draw(Renderer& renderer);
-
     SDL_Rect& getRectangle();
+    const SDL_Rect& getRectangle() const;
+    SDL_Texture* getTexture() const;
     PieceType getType() const;
     std::pair<int, int> getPosition() const;
     std::pair<int, int> getBoardPosition() const;

@@ -7,6 +7,8 @@
 #include <string>
 
 #include "DrawColor.h"
+#include "Piece.h"
+#include "Tile.h"
 
 class Renderer
 {
@@ -23,6 +25,9 @@ public:
     void fillRect(const SDL_Rect& rectangle);
     void drawRect(const SDL_Rect& rectangle);
     void fillAndDrawRect(const SDL_Rect& rectangle);
+
+    void drawPiece(const Piece& piece);
+    void drawTile(const Tile& tile);
 
     SDL_Texture* loadTexture(const std::string& path);
     // source and destination can be null, hence pass by pointer

@@ -37,8 +37,7 @@ void BoardDrawer::drawBoardRectangles()
         for (int j{ 0 }; j < constants::boardSize; ++j)
         {
             Tile currentTile{ m_tileBoard[i][j] };
-            m_renderer.setDrawColor(currentTile.getConvertedColor());
-            m_renderer.fillAndDrawRect(currentTile.getRectangle());
+            m_renderer.drawTile(currentTile);
             if (currentTile.isHighlighted())
             {
                 // todo: make it look nicer i guess
@@ -60,7 +59,7 @@ void BoardDrawer::drawPieces()
         {
             auto piece{ m_tileBoard[i][j].getPiece() };
             if (piece)
-                piece.value().draw(m_renderer);
+                m_renderer.drawPiece(piece.value());
         }
     }
 }
@@ -94,11 +93,8 @@ void BoardDrawer::drawPromotionPiecesRectangles(PromotionPieces& pieces)
 
 void BoardDrawer::drawPromotionPieces(PromotionPieces& pieces)
 {
-    // should probably change this to m_renderer.drawPiece(queen)
-    // that would make more sense
-    // why the hell does the piece class have a draw method anyways?
-    pieces.queen.draw(m_renderer);
-    pieces.rook.draw(m_renderer);
-    pieces.bishop.draw(m_renderer);
-    pieces.knight.draw(m_renderer);
+    m_renderer.drawPiece(pieces.queen);
+    m_renderer.drawPiece(pieces.rook);
+    m_renderer.drawPiece(pieces.bishop);
+    m_renderer.drawPiece(pieces.knight);
 }

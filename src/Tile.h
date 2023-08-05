@@ -13,7 +13,6 @@
 class Tile
 {
 public:
-    // todo: remove this
     Tile() = default;
     Tile(TileColor color, const std::optional<Piece>& piece,
          std::pair<int, int> position);

@@ -15,14 +15,19 @@ Piece::Piece(PieceType type, PieceColor color, SDL_Texture* texture,
                     constants::tileHeight };
 }
 
-void Piece::draw(Renderer& renderer)
-{
-    renderer.copyTexture(m_texture, nullptr, &m_rectangle);
-}
-
 SDL_Rect& Piece::getRectangle()
 {
     return m_rectangle;
+}
+
+const SDL_Rect& Piece::getRectangle() const
+{
+    return m_rectangle;
+}
+
+SDL_Texture* Piece::getTexture() const
+{
+    return m_texture;
 }
 
 void Piece::setPosition(std::pair<int, int> position)

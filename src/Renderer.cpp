@@ -43,6 +43,17 @@ void Renderer::fillAndDrawRect(const SDL_Rect& rectangle)
     drawRect(rectangle);
 }
 
+void Renderer::drawPiece(const Piece& piece)
+{
+    copyTexture(piece.getTexture(), nullptr, &piece.getRectangle());
+}
+
+void Renderer::drawTile(const Tile& tile)
+{
+    setDrawColor(tile.getConvertedColor());
+    fillAndDrawRect(tile.getRectangle());
+}
+
 SDL_Texture* Renderer::loadTexture(const std::string& path)
 {
     return IMG_LoadTexture(m_renderer, path.data());
