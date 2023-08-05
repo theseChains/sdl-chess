@@ -11,7 +11,7 @@
 class GameLogic
 {
 public:
-    GameLogic(TileBoard& tileBoard, Move& lastMove);
+    GameLogic(TileBoard& tileBoard);
 
     bool playerMoveIsValid(const Piece& piece, int newRow, int newColumn) const;
     bool playerTookEnPassant(const Piece& piece, int newRow, int newColumn,
@@ -23,6 +23,7 @@ public:
                           int oldColumn);
     bool playerPromotingPawn(const Piece& piece, int newRow,
                              int newColumn) const;
+    void checkForPawnPromotion(const Piece& piece, int newRow, int newColumn);
 
     void updateFiftyMoveCounter(const Piece& piece, int newRow, int newColumn,
                                 int oldRow, int oldColumn);
@@ -31,13 +32,22 @@ public:
     void resetFiftyMoveCounter();
     void incrementFiftyMoveCounter();
 
-    PieceColor checkForGameEnd(const std::vector<TileBoard>& positions,
-                               PieceColor currentColorToMove) const;
+    bool promotingPawn() const;
+    void setPawnPromotion(bool value);
+
+    const Move& getLastMove() const;
+    void setLastMove(const Move& lastMove);
+
+    void addPosition(const TileBoard& tileBoard);
+
+    PieceColor checkForGameEnd(PieceColor currentColorToMove) const;
 
 private:
     TileBoard& m_tileBoard;
-    Move& m_lastMove;
+    Move m_lastMove;
     int m_fiftyMoveCounter{};
+    std::vector<TileBoard> m_positions{};
+    bool m_promotingPawn{};
 };
 
 #endif

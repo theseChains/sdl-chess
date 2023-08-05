@@ -9,9 +9,14 @@
 #include "KingMateLogic.h"
 #include "MoveValidator.h"
 #include "PawnMovementLogic.h"
+#include "PieceType.h"
 
-GameLogic::GameLogic(TileBoard& tileBoard, Move& lastMove)
-    : m_tileBoard{ tileBoard }, m_lastMove{ lastMove }, m_fiftyMoveCounter{ 0 }
+GameLogic::GameLogic(TileBoard& tileBoard)
+    : m_tileBoard{ tileBoard },
+      m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none },
+      m_fiftyMoveCounter{ 0 },
+      m_positions{},
+      m_promotingPawn{ false }
 {
 }
 
@@ -32,7 +37,7 @@ bool GameLogic::playerTookEnPassant(const Piece& piece, int newRow,
             m_tileBoard[oldRow][newColumn].getPiece() &&
             m_tileBoard[oldRow][newColumn].getPiece()->getType() ==
                 PieceType::pawn &&
-            !m_tileBoard[newColumn][newRow].getPiece());
+            !m_tileBoard[newRow][newColumn].getPiece());
 }
 
 void GameLogic::checkForEnPassantCapture(const Piece& piece, int newRow,
@@ -76,6 +81,13 @@ bool GameLogic::playerPromotingPawn(const Piece& piece, int newRow,
             pawnIsPromoting(m_tileBoard, newRow, newColumn));
 }
 
+void GameLogic::checkForPawnPromotion(const Piece& piece, int newRow,
+                                      int newColumn)
+{
+    if (playerPromotingPawn(piece, newRow, newColumn))
+        m_promotingPawn = true;
+}
+
 void GameLogic::updatePieceProperties(int newRow, int newColumn)
 {
     Piece& pieceReference{ m_tileBoard[newRow][newColumn].getPiece().value() };
@@ -92,8 +104,32 @@ void GameLogic::incrementFiftyMoveCounter()
     ++m_fiftyMoveCounter;
 }
 
-PieceColor GameLogic::checkForGameEnd(const std::vector<TileBoard>& positions,
-                                      PieceColor currentColorToMove) const
+bool GameLogic::promotingPawn() const
+{
+    return m_promotingPawn;
+}
+
+void GameLogic::setPawnPromotion(bool value)
+{
+    m_promotingPawn = value;
+}
+
+const Move& GameLogic::getLastMove() const
+{
+    return m_lastMove;
+}
+
+void GameLogic::setLastMove(const Move& lastMove)
+{
+    m_lastMove = lastMove;
+}
+
+void GameLogic::addPosition(const TileBoard& tileBoard)
+{
+    m_positions.push_back(tileBoard);
+}
+
+PieceColor GameLogic::checkForGameEnd(PieceColor currentColorToMove) const
 {
     if (isKingCheckmated(m_tileBoard, currentColorToMove))
     {
@@ -112,13 +148,13 @@ PieceColor GameLogic::checkForGameEnd(const std::vector<TileBoard>& positions,
         currentColorToMove = PieceColor::noColor;
     }
 
-    if (std::ranges::count(positions, m_tileBoard) >= 3)
+    if (std::ranges::count(m_positions, m_tileBoard) >= 3)
     {
         std::cout << "draw by three-fold repetition\n";
         currentColorToMove = PieceColor::noColor;
     }
 
-    if (m_fiftyMoveCounter >= 50)
+    if (m_fiftyMoveCounter == 50)
     {
         std::cout << "draw by the fifty-rule move\n";
         currentColorToMove = PieceColor::noColor;

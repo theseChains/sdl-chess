@@ -9,12 +9,10 @@
 #include "PositionConversions.h"
 
 Board::Board(TextureTable& table, Renderer& renderer)
-    : m_lastMove{ { 0, 0 }, { 0, 0 }, PieceType::none },
+    : m_boardDrawer{ table, renderer, m_tileBoard },
+      m_gameLogic{ m_tileBoard },
       m_textureTable{ table },
-      m_renderer{ renderer },
-      m_positions{},
-      m_boardDrawer{ table, renderer, m_tileBoard },
-      m_gameLogic{ m_tileBoard, m_lastMove }
+      m_renderer{ renderer }
 {
     for (int i{ 0 }; i < constants::boardSize; ++i)
         for (int j{ 0 }; j < constants::boardSize; ++j)
@@ -25,8 +23,8 @@ void Board::draw()
 {
     m_boardDrawer.draw();
 
-    if (m_promotingPawn)
-        m_boardDrawer.drawPromotion(m_lastMove);
+    if (m_gameLogic.promotingPawn())
+        m_boardDrawer.drawPromotion(m_gameLogic.getLastMove());
 }
 
 void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
@@ -48,7 +46,7 @@ void Board::checkForPieceSelection(SDL_Point mousePosition, bool& pieceSelected,
 void Board::checkForPromotionPieceSelection(SDL_Point mousePosition)
 {
     auto [boardRow, boardColumn]{ getBoardPositionFromMouse(mousePosition) };
-    auto [pawnRow, pawnColumn]{ m_lastMove.to };
+    auto [pawnRow, pawnColumn]{ m_gameLogic.getLastMove().to };
     if (boardColumn != pawnColumn || std::abs(boardRow - pawnRow) > 3)
         return;
 
@@ -58,7 +56,7 @@ void Board::checkForPromotionPieceSelection(SDL_Point mousePosition)
     handlePromotedPieceSelection(pawnTile, m_textureTable, boardRow, pawnRow,
                                  pawnColumn);
 
-    m_promotingPawn = false;
+    m_gameLogic.setPawnPromotion(false);
 }
 
 Tile& Board::getTileReferenceByPosition(std::pair<int, int> position)
@@ -111,9 +109,8 @@ bool Board::checkBoardTile(Tile& tile, int newRow, int newColumn,
     if (m_gameLogic.playerMoveIsValid(piece.value(), newRow, newColumn))
     {
         auto [oldRow, oldColumn]{ piece->getBoardPosition() };
-        m_lastMove = { { oldRow, oldColumn },
-                       { newRow, newColumn },
-                       piece->getType() };
+        m_gameLogic.setLastMove(
+            { { oldRow, oldColumn }, { newRow, newColumn }, piece->getType() });
 
         m_gameLogic.checkForEnPassantCapture(piece.value(), newRow, newColumn,
                                              oldRow, oldColumn);
@@ -126,15 +123,13 @@ bool Board::checkBoardTile(Tile& tile, int newRow, int newColumn,
 
         m_gameLogic.checkForCastling(piece.value(), newRow, newColumn,
                                      oldColumn);
-        if (m_gameLogic.playerPromotingPawn(piece.value(), newRow, newColumn))
-            m_promotingPawn = true;
+        m_gameLogic.checkForPawnPromotion(piece.value(), newRow, newColumn);
 
         pieceSelected = false;
         changeCurrentMoveColor(currentColorToMove);
-        m_positions.push_back(m_tileBoard);
+        m_gameLogic.addPosition(m_tileBoard);
         m_gameLogic.updatePieceProperties(newRow, newColumn);
-        currentColorToMove =
-            m_gameLogic.checkForGameEnd(m_positions, currentColorToMove);
+        currentColorToMove = m_gameLogic.checkForGameEnd(currentColorToMove);
     }
     else
     {
@@ -175,7 +170,7 @@ TileBoard& Board::getTiles()
 
 bool Board::promotingPawn() const
 {
-    return m_promotingPawn;
+    return m_gameLogic.promotingPawn();
 }
 
 void Board::initializeTile(TextureTable& table, int i, int j)

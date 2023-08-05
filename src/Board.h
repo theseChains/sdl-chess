@@ -32,16 +32,12 @@ public:
     bool promotingPawn() const;
 
 private:
-    // todo: move some stuff to gamelogic classs
     TileBoard m_tileBoard{};
-    Move m_lastMove{};
-    TextureTable& m_textureTable;
-    Renderer& m_renderer;
-    std::vector<TileBoard> m_positions{};
     BoardDrawer m_boardDrawer;
     GameLogic m_gameLogic;
 
-    bool m_promotingPawn{ false };
+    TextureTable& m_textureTable;
+    Renderer& m_renderer;
 
     void initializeTile(TextureTable& table, int i, int j);
     void placePieceAtChosenTile(int newRow, int newColumn,
