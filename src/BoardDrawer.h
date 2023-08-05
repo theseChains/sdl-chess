@@ -1,7 +1,13 @@
 #ifndef BOARD_DRAWER_H
 #define BOARD_DRAWER_H
 
+#include <array>
+
 #include "Aliases.h"
+#include "Constants.h"
+#include "Move.h"
+#include "PieceType.h"
+#include "PromotionOperations.h"
 #include "Renderer.h"
 #include "TextureTable.h"
 
@@ -12,6 +18,7 @@ public:
                 TileBoard& board);
 
     void draw();
+    void drawPromotion(const Move& lastMove);
 
 private:
     TextureTable& m_textureTable;
@@ -20,6 +27,9 @@ private:
 
     void drawBoardRectangles();
     void drawPieces();
+
+    void drawPromotionPiecesRectangles(PromotionPieces& pieces);
+    void drawPromotionPieces(PromotionPieces& pieces);
 };
 
 #endif
