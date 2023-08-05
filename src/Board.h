@@ -32,6 +32,7 @@ public:
     bool promotingPawn() const;
 
 private:
+    // todo: move some stuff to gamelogic classs
     TileBoard m_tileBoard{};
     Move m_lastMove{};
     TextureTable& m_textureTable;

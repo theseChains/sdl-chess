@@ -5,7 +5,6 @@
 
 #include "Colors.h"
 #include "Constants.h"
-#include "KingCastleLogic.h"
 #include "PieceArrangement.h"
 #include "PositionConversions.h"
 
@@ -90,15 +89,9 @@ void Board::placePieceAtChosenTile(int newRow, int newColumn,
 void Board::highlightValidMoves(const Piece& piece)
 {
     for (int i{ 0 }; i < constants::boardSize; ++i)
-    {
         for (int j{ 0 }; j < constants::boardSize; ++j)
-        {
             if (m_gameLogic.playerMoveIsValid(piece, i, j))
-            {
                 m_tileBoard[i][j].highlight();
-            }
-        }
-    }
 }
 
 void Board::resetMoveHighlight()
@@ -122,18 +115,17 @@ bool Board::checkBoardTile(Tile& tile, int newRow, int newColumn,
                        { newRow, newColumn },
                        piece->getType() };
 
-        if (m_gameLogic.playerTookEnPassant(piece.value(), newRow, newColumn,
-                                            oldRow, oldColumn))
-        {
-            m_tileBoard[oldRow][newColumn].removePiece();
-        }
+        m_gameLogic.checkForEnPassantCapture(piece.value(), newRow, newColumn,
+                                             oldRow, oldColumn);
+        m_gameLogic.updateFiftyMoveCounter(piece.value(), newRow, newColumn,
+                                           oldRow, oldColumn);
 
         tile.removePiece();
         m_tileBoard[newRow][newColumn].removePiece();
         placePieceAtChosenTile(newRow, newColumn, piece);
-        if (m_gameLogic.playerCastled(piece.value(), newColumn, oldColumn))
-            moveRookForCastling(m_tileBoard, newRow, newColumn);
 
+        m_gameLogic.checkForCastling(piece.value(), newRow, newColumn,
+                                     oldColumn);
         if (m_gameLogic.playerPromotingPawn(piece.value(), newRow, newColumn))
             m_promotingPawn = true;
 

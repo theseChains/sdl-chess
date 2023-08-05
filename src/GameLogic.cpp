@@ -4,13 +4,14 @@
 #include <iostream>
 #include <ranges>
 
+#include "KingCastleLogic.h"
 #include "KingCheckLogic.h"
 #include "KingMateLogic.h"
 #include "MoveValidator.h"
 #include "PawnMovementLogic.h"
 
 GameLogic::GameLogic(TileBoard& tileBoard, Move& lastMove)
-    : m_tileBoard{ tileBoard }, m_lastMove{ lastMove }
+    : m_tileBoard{ tileBoard }, m_lastMove{ lastMove }, m_fiftyMoveCounter{ 0 }
 {
 }
 
@@ -34,11 +35,38 @@ bool GameLogic::playerTookEnPassant(const Piece& piece, int newRow,
             !m_tileBoard[newColumn][newRow].getPiece());
 }
 
+void GameLogic::checkForEnPassantCapture(const Piece& piece, int newRow,
+                                         int newColumn, int oldRow,
+                                         int oldColumn)
+{
+    if (playerTookEnPassant(piece, newRow, newColumn, oldRow, oldColumn))
+        m_tileBoard[oldRow][newColumn].removePiece();
+}
+
+void GameLogic::updateFiftyMoveCounter(const Piece& piece, int newRow,
+                                       int newColumn, int oldRow, int oldColumn)
+{
+    if (playerTookEnPassant(piece, newRow, newColumn, oldRow, oldColumn))
+        resetFiftyMoveCounter();
+    else if (m_lastMove.pieceType != PieceType::pawn ||
+             !m_tileBoard[newRow][newColumn].getPiece())
+    {
+        incrementFiftyMoveCounter();
+    }
+}
+
 bool GameLogic::playerCastled(const Piece& piece, int newColumn,
                               int oldColumn) const
 {
     return (piece.getType() == PieceType::king &&
             std::abs(oldColumn - newColumn) == 2);
+}
+
+void GameLogic::checkForCastling(const Piece& piece, int newRow, int newColumn,
+                                 int oldColumn)
+{
+    if (playerCastled(piece, newColumn, oldColumn))
+        moveRookForCastling(m_tileBoard, newRow, newColumn);
 }
 
 bool GameLogic::playerPromotingPawn(const Piece& piece, int newRow,
@@ -50,10 +78,18 @@ bool GameLogic::playerPromotingPawn(const Piece& piece, int newRow,
 
 void GameLogic::updatePieceProperties(int newRow, int newColumn)
 {
-    Piece& pieceReference{
-        m_tileBoard[newRow][newColumn].getPiece().value()
-    };
+    Piece& pieceReference{ m_tileBoard[newRow][newColumn].getPiece().value() };
     pieceReference.setHasMoved();
+}
+
+void GameLogic::resetFiftyMoveCounter()
+{
+    m_fiftyMoveCounter = 0;
+}
+
+void GameLogic::incrementFiftyMoveCounter()
+{
+    ++m_fiftyMoveCounter;
 }
 
 PieceColor GameLogic::checkForGameEnd(const std::vector<TileBoard>& positions,
@@ -79,6 +115,12 @@ PieceColor GameLogic::checkForGameEnd(const std::vector<TileBoard>& positions,
     if (std::ranges::count(positions, m_tileBoard) >= 3)
     {
         std::cout << "draw by three-fold repetition\n";
+        currentColorToMove = PieceColor::noColor;
+    }
+
+    if (m_fiftyMoveCounter >= 50)
+    {
+        std::cout << "draw by the fifty-rule move\n";
         currentColorToMove = PieceColor::noColor;
     }
 
