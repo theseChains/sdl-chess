@@ -53,11 +53,15 @@ void GameLogic::updateFiftyMoveCounter(const Piece& piece, int newRow,
 {
     if (playerTookEnPassant(piece, newRow, newColumn, oldRow, oldColumn))
         resetFiftyMoveCounter();
-    else if (m_lastMove.pieceType != PieceType::pawn ||
+    else if (m_lastMove.pieceType != PieceType::pawn &&
              !m_tileBoard[newRow][newColumn].getPiece())
     {
         incrementFiftyMoveCounter();
     }
+    else
+        resetFiftyMoveCounter();
+
+    std::cout << "fifty move counter: " << m_fiftyMoveCounter << '\n';
 }
 
 bool GameLogic::playerCastled(const Piece& piece, int newColumn,
