@@ -60,8 +60,6 @@ void GameLogic::updateFiftyMoveCounter(const Piece& piece, int newRow,
     }
     else
         resetFiftyMoveCounter();
-
-    std::cout << "fifty move counter: " << m_fiftyMoveCounter << '\n';
 }
 
 bool GameLogic::playerCastled(const Piece& piece, int newColumn,
