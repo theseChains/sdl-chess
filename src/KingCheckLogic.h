@@ -8,7 +8,7 @@
 #include "Tile.h"
 
 std::pair<int, int> findKingPosition(const TileBoard& board,
-                                                    PieceColor kingColor);
+                                     PieceColor kingColor);
 
 bool isKingInCheck(const TileBoard& board, PieceColor kingColor);
 // pass a copy of the board to see if the king will be in check after moving a

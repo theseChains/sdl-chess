@@ -4,9 +4,9 @@
 
 #include "Colors.h"
 #include "Constants.h"
+#include "KingCheckLogic.h"
 #include "PositionConversions.h"
 #include "PromotionOperations.h"
-#include "KingCheckLogic.h"
 
 BoardDrawer::BoardDrawer(TextureTable& textureTable, Renderer& renderer,
                          TileBoard& tileBoard)
@@ -36,7 +36,7 @@ void BoardDrawer::highlightKingCheck(const Tile& currentTile)
     if (isKingInCheck(m_tileBoard, currentTile.getPiece()->getColor()))
     {
         auto [rectangleX, rectangleY]{ convertToRectanglePosition(
-                currentTile.getPosition()) };
+            currentTile.getPosition()) };
         SDL_Rect validMoveRectangle{ rectangleX, rectangleY, 20, 20 };
         m_renderer.setDrawColor(colors::red);
         m_renderer.fillAndDrawRect(validMoveRectangle);
@@ -59,7 +59,8 @@ void BoardDrawer::drawBoardRectangles()
                 m_renderer.setDrawColor(colors::green);
                 m_renderer.fillAndDrawRect(validMoveRectangle);
             }
-            if (currentTile.getPiece() && currentTile.getPiece()->getType() == PieceType::king)
+            if (currentTile.getPiece() &&
+                currentTile.getPiece()->getType() == PieceType::king)
             {
                 highlightKingCheck(currentTile);
             }

@@ -1,13 +1,13 @@
 #include "KingCheckLogic.h"
 
 #include <iostream>
-#include <stdexcept>
 #include <optional>
+#include <stdexcept>
 
 #include "MoveValidator.h"
 
 std::pair<int, int> findKingPosition(const TileBoard& board,
-                                                    PieceColor kingColor)
+                                     PieceColor kingColor)
 {
     for (const auto& row : board)
     {
