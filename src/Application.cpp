@@ -6,7 +6,7 @@
 Application::Application()
     : m_window{ constants::windowWidth, constants::windowHeight },
       m_renderer{ m_window.getWindow(), constants::renderDriverIndex,
-                  SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE },
+                  SDL_RENDERER_PRESENTVSYNC },
       m_textures{ m_renderer },
       m_board{ m_textures, m_renderer },
       m_userInput{}
