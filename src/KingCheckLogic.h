@@ -7,7 +7,7 @@
 #include "Board.h"
 #include "Tile.h"
 
-std::optional<std::pair<int, int>> findKingPosition(const TileBoard& board,
+std::pair<int, int> findKingPosition(const TileBoard& board,
                                                     PieceColor kingColor);
 
 bool isKingInCheck(const TileBoard& board, PieceColor kingColor);
