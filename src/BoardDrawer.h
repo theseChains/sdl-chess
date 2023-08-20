@@ -10,6 +10,7 @@
 #include "PromotionOperations.h"
 #include "Renderer.h"
 #include "TextureTable.h"
+#include "Tile.h"
 
 class BoardDrawer
 {
@@ -30,6 +31,8 @@ private:
 
     void drawPromotionPiecesRectangles(PromotionPieces& pieces);
     void drawPromotionPieces(PromotionPieces& pieces);
+
+    void highlightKingCheck(const Tile& currentTile);
 };
 
 #endif
