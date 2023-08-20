@@ -37,7 +37,9 @@ void BoardDrawer::highlightKingCheck(const Tile& currentTile)
     {
         auto [rectangleX, rectangleY]{ convertToRectanglePosition(
             currentTile.getPosition()) };
-        SDL_Rect validMoveRectangle{ rectangleX, rectangleY, 20, 20 };
+        SDL_Rect validMoveRectangle{ rectangleX, rectangleY,
+                                     constants::highlightRectangleSize,
+                                     constants::highlightRectangleSize };
         m_renderer.setDrawColor(colors::red);
         m_renderer.fillAndDrawRect(validMoveRectangle);
     }
@@ -55,7 +57,10 @@ void BoardDrawer::drawBoardRectangles()
             {
                 auto [rectangleX, rectangleY]{ convertToRectanglePosition(
                     currentTile.getPosition()) };
-                SDL_Rect validMoveRectangle{ rectangleX, rectangleY, 20, 20 };
+                SDL_Rect validMoveRectangle{
+                    rectangleX, rectangleY, constants::highlightRectangleSize,
+                    constants::highlightRectangleSize
+                };
                 m_renderer.setDrawColor(colors::green);
                 m_renderer.fillAndDrawRect(validMoveRectangle);
             }

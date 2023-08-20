@@ -23,6 +23,8 @@ namespace constants
     inline constexpr int promotionRookPositionDifference{ 1 };
     inline constexpr int promotionBishopPositionDifference{ 2 };
     inline constexpr int promotionKnightPositionDifference{ 3 };
+
+    inline constexpr int highlightRectangleSize{ 20 };
 }
 
 #endif
