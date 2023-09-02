@@ -141,6 +141,8 @@ PieceColor GameLogic::checkForGameEnd(PieceColor currentColorToMove) const
             std::cout << "black king is checkmated, white wins!\n";
 
         currentColorToMove = PieceColor::noColor;
+
+        return currentColorToMove;
     }
 
     if (!isKingInCheck(m_tileBoard, currentColorToMove) &&
