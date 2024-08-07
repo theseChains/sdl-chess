@@ -48,9 +48,9 @@ Example:
     ```
 
 ## Screenshots
-<img src="screenshots/start-position.png" alt="Start position" width="500" />
-<img src="screenshots/some-moves.png" alt="After some moves" width="500" />
-<img src="screenshots/checkmate.png" alt="Checkmate" width="500" />
+<img src="screenshots/start-position.png?" alt="Start position" width="500" />
+<img src="screenshots/some-moves.png?" alt="After some moves" width="500" />
+<img src="screenshots/checkmate.png?" alt="Checkmate" width="500" />
 
 ## Contributions
-Piece textures by: [Ckyannahall2023](https://github.com/Ckyannahall2023)
+Old piece textures by: [Ckyannahall2023](https://github.com/Ckyannahall2023)
