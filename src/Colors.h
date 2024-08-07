@@ -23,8 +23,8 @@ namespace colors
     inline constexpr DrawColor green{ 50, 205, 50, 255 };
     inline constexpr DrawColor red{ 220, 20, 60, 255 };
 
-    inline constexpr DrawColor lightTile{ 230, 230, 230, 255 };
-    inline constexpr DrawColor darkTile{ 150, 75, 0, 255 };
+    inline constexpr DrawColor lightTile{ 211, 211, 211, 255 };
+    inline constexpr DrawColor darkTile{ 105, 105, 105, 255 };
 }
 
 TileColor getTileColor(int x, int y);
